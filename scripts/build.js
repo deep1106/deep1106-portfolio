@@ -1,24 +1,19 @@
 const fs = require('fs');
 const path = require('path');
 
-const rootDir = __dirname;
+const rootDir = path.resolve(process.cwd());
 const distDir = path.join(rootDir, 'dist');
 
-// Clean dist directory
 if (fs.existsSync(distDir)) {
   fs.rmSync(distDir, { recursive: true });
 }
 fs.mkdirSync(distDir, { recursive: true });
-fs.mkdirSync(path.join(distDir, 'functions', 'api'), { recursive: true });
-fs.mkdirSync(path.join(distDir, 'css'), { recursive: true });
-fs.mkdirSync(path.join(distDir, 'js'), { recursive: true });
 
-// Copy static files
 const copyRecursive = (src, dest) => {
   const stats = fs.statSync(src);
   if (stats.isDirectory()) {
     fs.mkdirSync(dest, { recursive: true });
-    fs.readdirSync(src).forEach(file => {
+    fs.readdirSync(src).forEach((file) => {
       copyRecursive(path.join(src, file), path.join(dest, file));
     });
   } else {
@@ -26,11 +21,20 @@ const copyRecursive = (src, dest) => {
   }
 };
 
-// Copy public files
-copyRecursive(path.join(rootDir, 'public'), distDir);
+['public', 'functions'].forEach((dir) => {
+  const src = path.join(rootDir, dir);
+  const dest = path.join(distDir, dir);
+  if (!fs.existsSync(src)) {
+    throw new Error(`Missing source directory: ${src}`);
+  }
+  copyRecursive(src, dest);
+});
 
-// Copy functions
-copyRecursive(path.join(rootDir, 'functions'), path.join(distDir, 'functions'));
+// Ensure index.html is served from root
+const publicIndex = path.join(distDir, 'public', 'index.html');
+const rootIndex = path.join(distDir, 'index.html');
+if (fs.existsSync(publicIndex)) {
+  fs.copyFileSync(publicIndex, rootIndex);
+}
 
-console.log('✅ Build complete! Files copied to /dist');
-console.log('📦 Ready for deployment to Cloudflare Pages');
+console.log('Build complete!');

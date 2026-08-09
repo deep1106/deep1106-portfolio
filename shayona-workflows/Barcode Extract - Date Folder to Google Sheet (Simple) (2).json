@@ -1,0 +1,336 @@
+{
+  "name": "Barcode Extract - Date Folder to Google Sheet (Simple)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "ab99669d-6e1a-495d-ac4f-501633bfb2eb",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        2560,
+        -656
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const validItems = items.filter(item => {\n  const name = (item.json.name || '').trim();\n  return /^[0-9]{4,20}$/.test(name);\n});\n\nvalidItems.sort((a, b) => {\n  return Number(a.json.name) - Number(b.json.name);\n});\n\nreturn validItems.map(item => ({\n  json: {\n    Barcode: item.json.name.trim(),\n    \"Folder ID\": item.json.id\n  }\n}));"
+      },
+      "id": "41bb1aec-36f2-4ec0-8fc7-738737785f95",
+      "name": "Extract Barcode + Folder ID1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3056,
+        -656
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "returnAll": true,
+        "filter": {
+          "driveId": {
+            "__rl": true,
+            "mode": "list",
+            "value": "My Drive"
+          },
+          "folderId": {
+            "__rl": true,
+            "value": "1n_YTX6FCtfk7NDHYHtWtH7F29wFxvc3l",
+            "mode": "id"
+          },
+          "whatToSearch": "folders"
+        },
+        "options": {
+          "fields": [
+            "id",
+            "name",
+            "mimeType",
+            "parents",
+            "*"
+          ]
+        }
+      },
+      "id": "189cc5dd-fedd-42c4-9ec1-0ff60d20f647",
+      "name": "List All Subfolders2",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2768,
+        -656
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": <REDACTED>,
+          "name": <REDACTED>
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "=1mJBnSwAqofRqihkTziffZmo2Oe-DOardpfOJc0Acytg",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mJBnSwAqofRqihkTziffZmo2Oe-DOardpfOJc0Acytg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Barcode": "={{ $json.Barcode }}",
+            "Folder ID": "={{ $json['Folder ID'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Barcode",
+              "displayName": "Barcode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Price",
+              "displayName": "Price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Image URL",
+              "displayName": "Image URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Saree Type(s)",
+              "displayName": "Saree Type(s)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Occasion(s)",
+              "displayName": "Occasion(s)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Style(s)",
+              "displayName": "Style(s)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Fabric(s)",
+              "displayName": "Fabric(s)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Work",
+              "displayName": "Work",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Processing Started At",
+              "displayName": "Processing Started At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Processed At",
+              "displayName": "Processed At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Doc URL",
+              "displayName": "Doc URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Folder ID",
+              "displayName": "Folder ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Error Reason",
+              "displayName": "Error Reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Error Type",
+              "displayName": "Error Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Failed Node",
+              "displayName": "Failed Node",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Failed At",
+              "displayName": "Failed At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "a3c75d39-5c1f-4441-b4ba-081c3adc9a2e",
+      "name": "Append To Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        3280,
+        -672
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hRsgudIzdSD80ooI",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "List All Subfolders2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Barcode + Folder ID1": {
+      "main": [
+        [
+          {
+            "node": "Append To Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List All Subfolders2": {
+      "main": [
+        [
+          {
+            "node": "Extract Barcode + Folder ID1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "7bd894f4-2597-459a-9816-842513d18601",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "552c31719a999e81101c0449b0e6cbf96245ec33215203874987912ed56dfeb3"
+  },
+  "id": "ZLS1cuYMpIJusrWt",
+  "tags": []
+}

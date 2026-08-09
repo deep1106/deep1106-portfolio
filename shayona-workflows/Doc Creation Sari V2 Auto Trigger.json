@@ -1,0 +1,1752 @@
+{
+  "name": "Shayona Doc Creation Sari Very Final Auto Trigger",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "returnAll": true,
+        "filter": {
+          "driveId": {
+            "mode": "list",
+            "value": "My Drive"
+          },
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $('Set Context').item.json.folderId }}",
+            "mode": "id"
+          },
+          "whatToSearch": "files"
+        },
+        "options": {
+          "fields": [
+            "id",
+            "name",
+            "mimeType",
+            "*"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1200,
+        480
+      ],
+      "id": "9bba3845-1750-4313-81ea-6d6b421abfde",
+      "name": "List Folder Files",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "T749MOGwq4Zcymuh",
+          "name": "Google Drive account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.imageFound }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -752,
+        416
+      ],
+      "id": "95f88b16-cf1b-476f-a890-371b53096e1f",
+      "name": "Image Found?"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "=# ROLE\nYou are an expert Indian Saree Visual Analyst.\n\nYou will receive ONE saree image only (the main product image, usually the \"5\" image).\n\nYour job is to analyze ONLY what is visually visible in the image.\n\n# AUTHORITATIVE INVENTORY DATA\nThe following values come from the inventory system and are already finalized.\n\nDO NOT modify, classify, reinterpret, infer, replace, or override them.\n\nBarcode: {{ $('Set Context').item.json.barcode }}\nSaree Type: {{ $('Set Context').item.json.sareeType }}\nOccasion: {{ $('Set Context').item.json.occasion }}\nStyle: {{ $('Set Context').item.json.style }}\nFabric: {{ $('Set Context').item.json.fabric }}\nWork: {{ $('Set Context').item.json.work }}\n\n# PRIMARY TASKS\nAnalyze the image and generate:\n1. Exact Saree Color\n2. Product Title\n3. Five Work Detail Bullet Points\n4. Motif Analysis\n5. Weaving Description\n\n# STRICT VISUAL ANALYSIS RULE\nGenerate content ONLY from visible visual evidence.\n\nIf a detail is not clearly visible:\n- Describe only observable characteristics.\n- Never invent hidden details.\n- Never assume fabric, weaving method, or craftsmanship that cannot be seen.\n\n# ABSOLUTE PROHIBITIONS\nYou must NEVER generate, infer, classify, or mention:\n\u2717 Price\n\u2717 Fabric classification\n\u2717 Saree Type classification\n\u2717 Occasion classification\n\u2717 Style classification\n\u2717 Collections\n\u2717 Work classification\n\nThese values already exist in inventory data and must not be recreated.\n\n# COLOR DETECTION RULES\nDetermine the PRIMARY saree color from the image.\n\nUse professional textile color terminology.\n\nExamples:\n- Maroon\n- Bottle Green\n- Royal Blue\n- Ivory\n- Mustard\n- Rust\n- Teal\n- Magenta\n- Champagne\n- Coral\n- Wine\n- Rani Pink\n- Mehendi Green\n- Peacock Blue\n\nAvoid:\n- Colorful\n- Multi Color\n- Bright Color\n- Dark Color\n\nOnly use \"Multicolor\" if it is genuinely the dominant appearance.\n\nReturn a single primary color.\n\n# PRODUCT TITLE RULE\n\nCreate a premium ecommerce saree title using:\n\n- Detected Visual Color\n- Inventory Saree Type\n- Inventory Fabric\n- Inventory Occasion\n\nThe AI may rearrange the order naturally to create the most marketable and readable title.\n\nRequirements:\n\n- Maximum 80 characters\n- Natural ecommerce wording\n- Use detected color as the primary descriptor\n- Use Saree Type from inventory\n- Use Fabric from inventory\n- Use Occasion from inventory\n- Avoid repetition\n- Avoid duplicate use of the word \"Saree\"\n- Do not include barcode\n- Do not include price\n- Do not include work type unless naturally required\n- Create a title that sounds like a premium marketplace listing\n\nGood Examples:\nMaroon Banarasi Art Silk Wedding Saree\nBottle Green Patola Silk Festive Wear Saree\nRoyal Blue Printed Cotton Casual Wear Saree\nWine Traditional Silk Party Wear Saree\nMehendi Green Designer Art Silk Saree\nIf inventory values contain redundant words, intelligently remove duplicates while preserving meaning.\nReturn only the final title in the JSON field:\n\"productTitle\"\n\n# WORK DETAILS\nGenerate EXACTLY 5 bullet points.\n\nEach bullet must be a complete sentence.\n\nCover:\n1. Overall saree body design or pattern\n2. Border design and visible technique\n3. Pallu details\n4. Visible decorative elements and motif placement\n5. Visible weaving, embellishment, or craftsmanship\n\nReturn exactly 5 items.\n\n# OUTPUT REQUIREMENTS\nReturn ONLY valid JSON.\n\nNo markdown.\nNo explanations.\nNo comments.\nNo additional text.\n\nOutput schema:\n\n{\n  \"color\": \"\",\n  \"productTitle\": \"\",\n  \"workDetails\": [\n    \"\",\n    \"\",\n    \"\",\n    \"\",\n    \"\"\n  ]\n}",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        112,
+        304
+      ],
+      "id": "0023400b-cc0b-48d6-af31-92658fb2706a",
+      "name": "Analyze an image",
+      "retryOnFail": false,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "dyPrezhlKEJFW9ox",
+          "name": "Shayona mktg paid"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n// PARSE AND MERGE AI PRODUCT DATA  (v5 \u2014 context-safe via Set Context)\n//\n// AUTHORITY MAP:\n//   Sheet (via Set Context) \u2192 barcode, folderId, price, work, sareeType,\n//                              occasion, style, fabric\n//   AI    \u2192 color, productTitle, workDetails, borderAnalysis, palluAnalysis,\n//            motifAnalysis, weavingDescription, seoDescription, tags\n//\n// Collections built ONLY from sheet: sareeType + occasion + style + fabric.\n// Color comes from AI visual analysis \u2014 never from sheet.\n// Work comes from sheet \u2014 AI uses it for context only.\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\nconst aiRaw = $input.first().json;\nconst ctx   = $('Set Context').first().json;\n\n// \u2500\u2500 Helper functions \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nfunction findText(value) {\n  if (value === null || value === undefined) return '';\n  if (typeof value === 'string') return value;\n  if (value.content && Array.isArray(value.content.parts))\n    return value.content.parts.map(p => p.text || '').join('\\n');\n  if (value.text)     return String(value.text);\n  if (value.output)   return typeof value.output === 'string' ? value.output : findText(value.output);\n  if (value.response) return typeof value.response === 'string' ? value.response : findText(value.response);\n  if (Array.isArray(value)) {\n    for (const e of value) { const f = findText(e); if (f) return f; }\n  }\n  if (typeof value === 'object') {\n    for (const k of Object.keys(value)) {\n      const f = findText(value[k]);\n      if (f && f.includes('{')) return f;\n    }\n  }\n  return JSON.stringify(value);\n}\n\nfunction cleanJsonText(text) {\n  let c = String(text || '').trim();\n  if (c.startsWith('```')) {\n    const nl = c.indexOf('\\n');\n    if (nl >= 0) c = c.slice(nl + 1).trim();\n    if (c.endsWith('```')) c = c.slice(0, -3).trim();\n  }\n  const fb = c.indexOf('{'), lb = c.lastIndexOf('}');\n  if (fb >= 0 && lb > fb) c = c.slice(fb, lb + 1);\n  return c;\n}\n\nfunction toArray(v) {\n  if (Array.isArray(v)) return v.filter(Boolean).map(x => String(x).trim()).filter(Boolean);\n  if (!v) return [];\n  return String(v).split(/[,\\n]/).map(x => x.trim()).filter(Boolean);\n}\n\nfunction onlyPrice(v) {\n  const t = String(v || '');\n  let o = '';\n  for (const ch of t) if ('0123456789.'.includes(ch)) o += ch;\n  return o;\n}\n\n// \u2500\u2500 Parse Gemini response \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nlet ai;\ntry {\n  ai = JSON.parse(cleanJsonText(findText(aiRaw)));\n} catch (err) {\n  ai = {\n    color: '',\n    productTitle: ctx.barcode,\n    workDetails: [],\n    borderAnalysis: '',\n    palluAnalysis: '',\n    tags: [],\n    parseError: err.message,\n    rawGemini: findText(aiRaw)\n  };\n}\n\n// \u2500\u2500 Sheet values (authoritative, via Set Context) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nconst price     = onlyPrice(ctx.price);\nconst work      = String(ctx.work || '').trim();       // from sheet\nconst sareeType = toArray(ctx.sareeType);\nconst occasion  = toArray(ctx.occasion);\nconst style     = toArray(ctx.style);\nconst fabric    = toArray(ctx.fabric);\n\n// \u2500\u2500 AI values \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nconst color       = String(ai.color || '').trim();     // from AI vision\nconst workDetails = toArray(ai.workDetails);\n\n// \u2500\u2500 Collections: built ONLY from sheet taxonomy \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nconst collections = [...sareeType, ...occasion, ...style, ...fabric];\n\n// \u2500\u2500 Tags: AI design tags + collections + AI color (deduped) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nconst tags = toArray(ai.tags);\nfor (const t of collections) if (t && !tags.includes(t)) tags.push(t);\nif (color && !tags.includes(color)) tags.push(color);\n\n// \u2500\u2500 Wash care (standard) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nconst washCare = [\n  'Dry Clean Recommended',\n  'Do Not Bleach',\n  'Steam Iron on Low Heat',\n  'Dry in Shade'\n];\n\n// \u2500\u2500 HTML description \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nconst descriptionHtml =\n  '<h3>Work Details</h3><ul>' +\n  workDetails.map(w => '<li>' + w + '</li>').join('') +\n  '</ul>' +\n  (ai.seoDescription ? '<h3>About This Saree</h3><p>' + ai.seoDescription + '</p>' : '') +\n  '<h3>Fabric Details</h3><p>' + fabric.join(', ') + '</p>' +\n  '<h3>Wash Care</h3><ul>' + washCare.map(w => '<li>' + w + '</li>').join('') + '</ul>';\n\nreturn [{\n  json: {\n    // Identifiers\n    barcode:  ctx.barcode,\n    folderId: ctx.folderId,\n\n    // \u2500\u2500 Sheet-authoritative \u2500\u2500\n    price,\n    work,          // from sheet\n    sareeType,\n    occasion,\n    style,\n    fabric,\n\n    // \u2500\u2500 AI-generated \u2500\u2500\n    color,         // from Gemini visual analysis\n    productTitle:       ai.productTitle  || ctx.barcode,\n    workDetails,\n\n    // \u2500\u2500 Merged \u2500\u2500\n    collections,\n    tags,\n    washCare,\n    descriptionHtml,\n\n    // Standard measurements\n    sareeLength:  '5.50 Meter',\n    blouseLength: '0.80 Meter',\n\n    // Raw AI for downstream nodes\n    aiParsed: ai\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        0
+      ],
+      "id": "261f77ac-163e-4ce5-ae42-d1094d7c8bef",
+      "name": "Parse and Merge AI Product Data1"
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n// PRODUCT.JSON  (v3 schema)\n//\n// Sheet fields:   price, work, sareeType, occasionWise, style, fabricCategory\n// AI fields:      color, productTitle, workDetails, tags\n//   (+ borderAnalysis, palluAnalysis, motifAnalysis, weavingDescription, seoDescription)\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nconst p = $json;\n\nconst productJson = {\n  // Identifiers\n  barcode:        p.barcode,\n\n  // \u2500\u2500 Sheet-authoritative \u2500\u2500\n  price:          p.price,\n  work:           p.work,           // from sheet\n  sareeType:      p.sareeType,\n  occasionWise:   p.occasion,\n  style:          p.style,\n  fabricCategory: p.fabric,\n\n  // \u2500\u2500 AI-generated \u2500\u2500\n  color:          p.color,          // from Gemini visual analysis\n  productTitle:   p.productTitle,\n  workDetails:    p.workDetails,\n  borderAnalysis:     p.borderAnalysis,\n  palluAnalysis:      p.palluAnalysis,\n  motifAnalysis:      p.motifAnalysis,\n  weavingDescription: p.weavingDescription,\n  seoDescription:     p.seoDescription,\n  tags:           p.tags\n};\n\nconst jsonString = JSON.stringify(productJson, null, 2);\n\nreturn [{\n  json: p,\n  binary: {\n    data: {\n      data:          Buffer.from(jsonString).toString('base64'),\n      mimeType:      'application/json',\n      fileName:      'product.json',\n      fileExtension: 'json'\n    }\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        0
+      ],
+      "id": "a8c6afba-5e4a-42b7-926c-78cdbaf5bd86",
+      "name": "product.json"
+    },
+    {
+      "parameters": {
+        "name": "product.json",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Set Context').item.json.folderId }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        816,
+        0
+      ],
+      "id": "7dd6be8c-2c17-426f-8f98-9b93abee0bfd",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "T749MOGwq4Zcymuh",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n// BUILD DOC URL  (v5 \u2014 context-safe via Set Context)\n// Extracts the Google Drive webViewLink from the saved DOCX response.\n// Barcode is read from Set Context, never from a transient field that could\n// have been overwritten by the Drive upload response.\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nconst driveFile = $('Save DOCX to Drive1').first().json;\nconst ctx       = $('Set Context').first().json;\n\nconst fileId = driveFile.id || driveFile.fileId || '';\nconst docUrl = driveFile.webViewLink ||\n               (fileId ? `https://drive.google.com/file/d/${fileId}/view` : '');\n\nreturn [{\n  json: {\n    barcode: ctx.barcode,\n    docUrl,\n    fileId\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        0
+      ],
+      "id": "899d245e-da27-42ad-9c83-dc341a2b9c1b",
+      "name": "Build Doc URL"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1mJBnSwAqofRqihkTziffZmo2Oe-DOardpfOJc0Acytg",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mJBnSwAqofRqihkTziffZmo2Oe-DOardpfOJc0Acytg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "Done",
+            "Processed At": "={{ new Date().toISOString() }}",
+            "Barcode": "={{ $json.barcode }}",
+            "Doc URL": "={{ $json.docUrl }}"
+          },
+          "matchingColumns": [
+            "Barcode"
+          ],
+          "schema": [
+            {
+              "id": "Barcode",
+              "displayName": "Barcode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Price",
+              "displayName": "Price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Image URL",
+              "displayName": "Image URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Saree Type(s)",
+              "displayName": "Saree Type(s)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Occasion(s)",
+              "displayName": "Occasion(s)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Style(s)",
+              "displayName": "Style(s)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Fabric(s)",
+              "displayName": "Fabric(s)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Work",
+              "displayName": "Work",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Processing Started At",
+              "displayName": "Processing Started At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Processed At",
+              "displayName": "Processed At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Doc URL",
+              "displayName": "Doc URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Folder ID",
+              "displayName": "Folder ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Error Reason",
+              "displayName": "Error Reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Error Type",
+              "displayName": "Error Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Failed Node",
+              "displayName": "Failed Node",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Failed At",
+              "displayName": "Failed At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1664,
+        400
+      ],
+      "id": "0b7032c9-63a6-4413-95ac-083897fe4d76",
+      "name": "Mark as Done",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "yd1uzXET3dKsd7Y1",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n// COLLECT ERROR CONTEXT  (v5 \u2014 context-safe via Set Context)\n// Called from any error branch (Image Found? = false, or Will Retry? = false\n// after 3 Gemini attempts exhausted). Normalises everything into the\n// detailed error-logging schema: Error Reason, Error Type, Failed Node,\n// Failed At. Barcode and Folder ID always come from Set Context first,\n// falling back to the current item only if Set Context is unreachable.\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nfunction getContext() {\n  try {\n    return $('Set Context').first().json;\n  } catch (e) {\n    return {};\n  }\n}\n\nconst input = $input.first().json;\nconst ctx   = getContext();\n\nconst barcode  = ctx.barcode  || input.barcode  || 'UNKNOWN';\nconst folderId = ctx.folderId || input.folderId || '';\n\n// If we arrived here from Classify Gemini Error / Classify Folder Error\n// (i.e. retries exhausted or Drive failure), the error type/reason/node\n// are already classified.\nlet errorType   = input.errorType   || '';\nlet errorReason = input.errorReason || '';\nlet failedNode  = input.failedNode  || '';\n\n// Otherwise (e.g. Image Found? = false branch) classify here directly.\nif (!errorType) {\n  errorReason = input.reason ||\n                input.error?.message ||\n                input.message ||\n                JSON.stringify(input).slice(0, 300);\n  failedNode  = input.failedNode || 'Unknown Node';\n  errorType   = input.errorType || 'Image Processing Error';\n}\n\nreturn [{\n  json: {\n    barcode,\n    folderId,\n    errorReason: String(errorReason).slice(0, 500),\n    errorType,\n    failedNode,\n    failedAt: new Date().toISOString()\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        816,
+        384
+      ],
+      "id": "a6813995-cd0e-4ebf-b5e3-613619be0cf8",
+      "name": "Collect Error Context"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1mJBnSwAqofRqihkTziffZmo2Oe-DOardpfOJc0Acytg",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mJBnSwAqofRqihkTziffZmo2Oe-DOardpfOJc0Acytg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Barcode": "={{ $('Set Context').item.json.barcode }}",
+            "Status": "Error",
+            "Error Reason": "={{ $json.errorReason }}",
+            "Error Type": "={{ $json.errorType }}",
+            "Failed Node": "={{ $json.failedNode }}",
+            "Failed At": "={{ $json.failedAt }}"
+          },
+          "matchingColumns": [
+            "Barcode"
+          ],
+          "schema": [
+            {
+              "id": "Barcode",
+              "displayName": "Barcode",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Processing Started At",
+              "displayName": "Processing Started At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": true
+            },
+            {
+              "id": "Error Reason",
+              "displayName": "Error Reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Error Type",
+              "displayName": "Error Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Failed Node",
+              "displayName": "Failed Node",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Failed At",
+              "displayName": "Failed At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1040,
+        384
+      ],
+      "id": "3cae9cd1-f235-482b-b203-babf80f555d5",
+      "name": "Mark as Error",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "yd1uzXET3dKsd7Y1",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -304,
+        288
+      ],
+      "id": "8da2976f-11f7-417e-b8bb-ed1f74742e02",
+      "name": "Wait4",
+      "webhookId": "cc80041b-a0ba-4e7c-a09f-c00fbbce7e99"
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n// GENERATE DOCX DIRECTLY  (v5 \u2014 context-safe, guarantees IBM Plex Sans)\n//\n// Builds a minimal, valid .docx (OOXML WordprocessingML inside a ZIP\n// container) entirely in JS, with no external dependencies. Every text run\n// explicitly declares <w:rFonts w:ascii=\"IBM Plex Sans\" w:hAnsi=\"IBM Plex Sans\"\n// w:cs=\"IBM Plex Sans\"/>, so the font is baked into the document XML itself\n// rather than depending on Google Drive's HTML->Docs font substitution\n// (which is the root cause of the intermittent font loss).\n//\n// CONTEXT SAFETY: by the time this node runs, $input.first().json is the\n// Drive file metadata returned by \"Upload file\" \u2014 NOT the product data.\n// Inventory fields are therefore always read from Set Context, and\n// AI-generated fields are always read from Parse and Merge AI Product\n// Data1 by name, never from the (lossy) immediate input.\n//\n// Formatting preserved exactly as before:\n//   Heading color  #3D85C6   size 14pt (28 half-points)  bold\n//   Body text      size 11pt (22 half-points)\n//   Bullets        standard Word bullet list (numbering.xml)\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\nconst ctx = $('Set Context').first().json;\nconst ai  = $('Parse and Merge AI Product Data1').first().json;\n\nconst p = {\n  barcode:            ctx.barcode,\n  folderId:           ctx.folderId,\n  price:              ctx.price,\n  work:               ctx.work,\n  sareeType:          ctx.sareeType,\n  occasion:           ctx.occasion,\n  style:              ctx.style,\n  fabric:             ai.fabric || ctx.fabric,\n  color:              ai.color,\n  productTitle:       ai.productTitle,\n  workDetails:        ai.workDetails,\n  motifAnalysis:      ai.motifAnalysis,\n  weavingDescription: ai.weavingDescription,\n  seoDescription:     ai.seoDescription,\n  collections:        ai.collections,\n  washCare:           ai.washCare\n};\n\n// ---- helpers ---------------------------------------------------------------\nconst esc = (s) => String(s == null ? '' : s)\n  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')\n  .replace(/\"/g, '&quot;').replace(/'/g, '&apos;');\n\nconst BODY_FONT    = 'IBM Plex Sans';\nconst HEADING_FONT = 'Cambria';\n\nfunction rPr(opts = {}) {\n  const {\n    bold,\n    color,\n    size,\n    font = BODY_FONT\n  } = opts;\n\n  let xml = '<w:rPr>';\n\n  xml += `<w:rFonts\n    w:ascii=\"${font}\"\n    w:hAnsi=\"${font}\"\n    w:cs=\"${font}\"\n    w:eastAsia=\"${font}\"/>`;\n\n  if (bold) xml += '<w:b/>';\n  if (color) xml += `<w:color w:val=\"${color}\"/>`;\n\n  xml += `<w:sz w:val=\"${size || 22}\"/>`;\n  xml += `<w:szCs w:val=\"${size || 22}\"/>`;\n\n  xml += '</w:rPr>';\n\n  return xml;\n}\n\nfunction run(text, opts = {}) {\n  return `<w:r>${rPr(opts)}<w:t xml:space=\"preserve\">${esc(text)}</w:t></w:r>`;\n}\n\nfunction heading(text) {\n  return `<w:p>\n    <w:pPr>\n      <w:pStyle w:val=\"Heading2\"/>\n      <w:spacing w:before=\"280\" w:after=\"40\"/>\n    </w:pPr>\n    ${run(text, {\n      font: 'Cambria',\n      bold: true,\n      color: '3D85C6',\n      size: 34\n    })}\n  </w:p>`;\n}\n\n\nfunction paragraph(text) {\n  return `<w:p>\n    <w:pPr>\n      <w:spacing w:before=\"0\" w:after=\"160\"/>\n    </w:pPr>\n    ${run(text, {\n      font: BODY_FONT,\n      size: 22\n    })}\n  </w:p>`;\n}\n\nfunction bullet(text) {\n  return `<w:p>\n    <w:pPr>\n      <w:numPr>\n        <w:ilvl w:val=\"0\"/>\n        <w:numId w:val=\"1\"/>\n      </w:numPr>\n      <w:spacing w:before=\"0\" w:after=\"40\"/>\n    </w:pPr>\n    ${run(text, {\n      font: BODY_FONT,\n      size: 22\n    })}\n  </w:p>`;\n}\n\nfunction section(title, bodyParas) {\n  let xml = heading(title);\n  for (const para of bodyParas) {\n    xml += Array.isArray(para) ? para.map(bullet).join('') : paragraph(para);\n  }\n  return xml;\n}\n\nfunction fabricBullet(label, value) {\n  return `<w:p>\n    <w:pPr>\n      <w:numPr>\n        <w:ilvl w:val=\"0\"/>\n        <w:numId w:val=\"1\"/>\n      </w:numPr>\n      <w:spacing w:before=\"0\" w:after=\"40\"/>\n    </w:pPr>\n\n    <w:r>\n      ${rPr({\n        font: BODY_FONT,\n        size: 22,\n        bold: true\n      })}\n      <w:t xml:space=\"preserve\">${esc(label + ': ')}</w:t>\n    </w:r>\n\n    <w:r>\n      ${rPr({\n        font: BODY_FONT,\n        size: 22\n      })}\n      <w:t xml:space=\"preserve\">${esc(value)}</w:t>\n    </w:r>\n\n  </w:p>`;\n}\n\nfunction numberedItem(text) {\n  return `<w:p>\n    <w:pPr>\n      <w:numPr>\n        <w:ilvl w:val=\"0\"/>\n        <w:numId w:val=\"2\"/>\n      </w:numPr>\n      <w:spacing w:before=\"0\" w:after=\"40\"/>\n    </w:pPr>\n    ${run(text, {\n      font: BODY_FONT,\n      size: 22\n    })}\n  </w:p>`;\n}\n\n// ---- assemble document body -------------------------------------------------\nconst safe    = (v, fb = '') => String(v || '').trim() || fb;\nconst safeArr = (v) => Array.isArray(v) ? v.filter(x => String(x || '').trim()) : (v ? [String(v).trim()] : []);\n\nlet body = '';\nbody += heading('Product Title');\nbody += paragraph(safe(p.productTitle));\nbody += section('Price', [p.price ? `\\u20b9 ${p.price}` : '']);\nbody += section('Color', [safe(p.color)]);\nbody += section('Work Details', [safeArr(p.workDetails)]);\n// Fabric Details\nbody += heading('Fabric Details');\n\nconst fabricValue = safeArr(p.fabric).join(', ');\n\nbody += fabricBullet('Saree Fabric', fabricValue);\nbody += fabricBullet('Blouse Fabric', fabricValue);\nbody += fabricBullet('Saree Length', '5.50 Meter');\nbody += fabricBullet('Blouse Length', '0.80 Meter');\n\n// Wash Care\nbody += section('Wash Care', [safeArr(p.washCare)]);\n\n// Collections\nbody += heading('Collections');\n\nsafeArr(p.collections).forEach(item => {\n  body += numberedItem(item);\n});\n\n\n\n// ---- OOXML parts -------------------------------------------------------------\nconst documentXml = `<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<w:document xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\">\n<w:body>\n${body}\n<w:sectPr><w:pgSz w:w=\"12240\" w:h=\"15840\"/><w:pgMar w:top=\"1440\" w:right=\"1440\" w:bottom=\"1440\" w:left=\"1440\" w:header=\"720\" w:footer=\"720\" w:gutter=\"0\"/></w:sectPr>\n</w:body>\n</w:document>`;\n\nconst numberingXml = `<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<w:numbering xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\">\n\n  <!-- BULLETS -->\n  <w:abstractNum w:abstractNumId=\"0\">\n    <w:multiLevelType w:val=\"hybridMultilevel\"/>\n\n    <w:lvl w:ilvl=\"0\">\n      <w:start w:val=\"1\"/>\n      <w:numFmt w:val=\"bullet\"/>\n      <w:lvlText w:val=\"\uf0b7\"/>\n      <w:lvlJc w:val=\"left\"/>\n\n      <w:pPr>\n        <w:ind w:left=\"720\" w:hanging=\"360\"/>\n      </w:pPr>\n\n      <w:rPr>\n        <w:rFonts\n          w:ascii=\"Symbol\"\n          w:hAnsi=\"Symbol\"\n          w:hint=\"default\"/>\n      </w:rPr>\n    </w:lvl>\n  </w:abstractNum>\n\n  <w:num w:numId=\"1\">\n    <w:abstractNumId w:val=\"0\"/>\n  </w:num>\n\n  <!-- NUMBERED LIST -->\n  <w:abstractNum w:abstractNumId=\"1\">\n    <w:multiLevelType w:val=\"hybridMultilevel\"/>\n\n    <w:lvl w:ilvl=\"0\">\n      <w:start w:val=\"1\"/>\n      <w:numFmt w:val=\"decimal\"/>\n      <w:lvlText w:val=\"%1.\"/>\n      <w:lvlJc w:val=\"left\"/>\n\n      <w:pPr>\n        <w:ind w:left=\"720\" w:hanging=\"360\"/>\n      </w:pPr>\n\n      <w:rPr>\n        <w:rFonts\n          w:ascii=\"${BODY_FONT}\"\n          w:hAnsi=\"${BODY_FONT}\"\n          w:cs=\"${BODY_FONT}\"\n          w:eastAsia=\"${BODY_FONT}\"/>\n      </w:rPr>\n    </w:lvl>\n  </w:abstractNum>\n\n  <w:num w:numId=\"2\">\n    <w:abstractNumId w:val=\"1\"/>\n  </w:num>\n\n</w:numbering>`;\n\n\nconst stylesXml = `<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<w:styles xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\">\n\n<w:docDefaults>\n  <w:rPrDefault>\n    <w:rPr>\n      <w:rFonts\n        w:ascii=\"${BODY_FONT}\"\n        w:hAnsi=\"${BODY_FONT}\"\n        w:cs=\"${BODY_FONT}\"\n        w:eastAsia=\"${BODY_FONT}\"/>\n      <w:sz w:val=\"22\"/>\n      <w:szCs w:val=\"22\"/>\n    </w:rPr>\n  </w:rPrDefault>\n</w:docDefaults>\n\n<w:style w:type=\"paragraph\" w:default=\"1\" w:styleId=\"Normal\">\n  <w:name w:val=\"Normal\"/>\n</w:style>\n\n<w:style w:type=\"paragraph\" w:styleId=\"Heading2\">\n  <w:name w:val=\"Heading 2\"/>\n\n  <w:pPr>\n    <w:outlineLvl w:val=\"1\"/>\n  </w:pPr>\n\n  <w:rPr>\n    <w:rFonts\n      w:ascii=\"Cambria\"\n      w:hAnsi=\"Cambria\"\n      w:cs=\"Cambria\"\n      w:eastAsia=\"Cambria\"/>\n\n    <w:b/>\n    <w:color w:val=\"3D85C6\"/>\n\n    <w:sz w:val=\"34\"/>\n    <w:szCs w:val=\"34\"/>\n  </w:rPr>\n</w:style>\n\n</w:styles>`;\n\nconst contentTypesXml = `<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\">\n<Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/>\n<Default Extension=\"xml\" ContentType=\"application/xml\"/>\n<Override PartName=\"/word/document.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\"/>\n<Override PartName=\"/word/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml\"/>\n<Override PartName=\"/word/numbering.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml\"/>\n</Types>`;\n\nconst rootRelsXml = `<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\">\n<Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument\" Target=\"word/document.xml\"/>\n</Relationships>`;\n\nconst docRelsXml = `<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\">\n\n<Relationship\n Id=\"rId1\"\n Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles\"\n Target=\"styles.xml\"/>\n\n<Relationship\n Id=\"rId2\"\n Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering\"\n Target=\"numbering.xml\"/>\n\n</Relationships>`;\n\n// ---- minimal ZIP (STORED method, no compression dependency) ----------------\nfunction crc32(buf) {\n  let c, crc = 0xFFFFFFFF;\n  for (let i = 0; i < buf.length; i++) {\n    c = (crc ^ buf[i]) & 0xFF;\n    for (let j = 0; j < 8; j++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);\n    crc = (crc >>> 8) ^ c;\n  }\n  return (crc ^ 0xFFFFFFFF) >>> 0;\n}\n\nfunction zipFile(name, content) {\n  const data = Buffer.from(content, 'utf8');\n  const crc = crc32(data);\n  const nameBuf = Buffer.from(name, 'utf8');\n\n  const localHeader = Buffer.alloc(30);\n  localHeader.writeUInt32LE(0x04034b50, 0);\n  localHeader.writeUInt16LE(20, 4);\n  localHeader.writeUInt16LE(0, 6);\n  localHeader.writeUInt16LE(0, 8);  // STORED = no compression\n  localHeader.writeUInt16LE(0, 10);\n  localHeader.writeUInt16LE(0, 12);\n  localHeader.writeUInt32LE(crc, 14);\n  localHeader.writeUInt32LE(data.length, 18);\n  localHeader.writeUInt32LE(data.length, 22);\n  localHeader.writeUInt16LE(nameBuf.length, 26);\n  localHeader.writeUInt16LE(0, 28);\n\n  return {\n    name, nameBuf, crc, size: data.length,\n    local: Buffer.concat([localHeader, nameBuf, data])\n  };\n}\n\nconst parts = [\n  zipFile('[Content_Types].xml', contentTypesXml),\n  zipFile('_rels/.rels', rootRelsXml),\n  zipFile('word/document.xml', documentXml),\n  zipFile('word/styles.xml', stylesXml),\n  zipFile('word/numbering.xml', numberingXml),\n  zipFile('word/_rels/document.xml.rels', docRelsXml),\n];\n\nlet offset = 0;\nconst localChunks = [];\nconst centralChunks = [];\n\nfor (const part of parts) {\n  localChunks.push(part.local);\n  const central = Buffer.alloc(46);\n  central.writeUInt32LE(0x02014b50, 0);\n  central.writeUInt16LE(20, 4);\n  central.writeUInt16LE(20, 6);\n  central.writeUInt16LE(0, 8);\n  central.writeUInt16LE(0, 10);\n  central.writeUInt16LE(0, 12);\n  central.writeUInt16LE(0, 14);\n  central.writeUInt32LE(part.crc, 16);\n  central.writeUInt32LE(part.size, 20);\n  central.writeUInt32LE(part.size, 24);\n  central.writeUInt16LE(part.nameBuf.length, 28);\n  central.writeUInt16LE(0, 30);\n  central.writeUInt16LE(0, 32);\n  central.writeUInt16LE(0, 34);\n  central.writeUInt16LE(0, 36);\n  central.writeUInt32LE(0, 38);\n  central.writeUInt32LE(offset, 42);\n  centralChunks.push(Buffer.concat([central, part.nameBuf]));\n  offset += part.local.length;\n}\n\nconst centralDirStart = offset;\nconst centralDir = Buffer.concat(centralChunks);\nconst centralDirSize = centralDir.length;\n\nconst eocd = Buffer.alloc(22);\neocd.writeUInt32LE(0x06054b50, 0);\neocd.writeUInt16LE(0, 4);\neocd.writeUInt16LE(0, 6);\neocd.writeUInt16LE(parts.length, 8);\neocd.writeUInt16LE(parts.length, 10);\neocd.writeUInt32LE(centralDirSize, 12);\neocd.writeUInt32LE(centralDirStart, 16);\neocd.writeUInt16LE(0, 20);\n\nconst zipBuffer = Buffer.concat([...localChunks, centralDir, eocd]);\nconst docTitle = p.barcode || 'product';\n\nreturn [{\n  json: { ...p, docTitle },\n  binary: {\n    data: {\n      data: zipBuffer.toString('base64'),\n      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',\n      fileName: docTitle + '.docx',\n      fileExtension: 'docx'\n    }\n  }\n}];\n"
+      },
+      "id": "a7d9a74e-03f4-46a8-8459-00d7aa56023b",
+      "name": "Generate DOCX Directly",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n// INIT GEMINI ATTEMPT COUNTER  (v4)\n// Runs once per item, right before the first Gemini call.\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nreturn $input.all().map(item => ({\n  json: {\n    ...item.json,\n    geminiAttempt: 1\n  },\n  binary: item.binary\n}));\n"
+      },
+      "id": "4061ed6c-dff1-4916-b81a-5848ead5ccc8",
+      "name": "Init Gemini Attempt Counter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -96,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n// CLASSIFY GEMINI ERROR  (v5 \u2014 context-safe via Set Context)\n//\n// Inspects the error payload n8n attaches when a node's continueErrorOutput\n// fires, classifies it into one of the documented Error Type buckets, and\n// decides whether this attempt should be retried (attempt < 3) or whether\n// we should give up and hand off to Mark as Error.\n//\n// All inventory fields (barcode, folderId, price, work, sareeType, occasion,\n// style, fabric) are read from Set Context \u2014 never from the current $json,\n// which at this point is only the error payload from the failed Gemini call.\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nconst errItem = $input.first().json;\nconst ctx     = $('Set Context').first().json;\n\nfunction getAttempt() {\n  if (errItem && errItem.geminiAttempt) return errItem.geminiAttempt;\n  try {\n    const retryItem = $('Restore Binary For Retry').first().json;\n    if (retryItem && retryItem.geminiAttempt) return retryItem.geminiAttempt;\n  } catch (e) { /* not reached yet */ }\n  try {\n    const initItem = $('Init Gemini Attempt Counter').first().json;\n    if (initItem && initItem.geminiAttempt) return initItem.geminiAttempt;\n  } catch (e) { /* not reached yet */ }\n  return 1;\n}\n\nconst attempt = getAttempt();\n\nconst rawMessage = String(\n  errItem.error?.message ||\n  errItem.message ||\n  JSON.stringify(errItem)\n).slice(0, 500);\n\nfunction classify(msg) {\n  const m = msg.toUpperCase();\n  if (m.includes('429') || m.includes('RESOURCE_EXHAUSTED') || m.includes('QUOTA_EXCEEDED') ||\n      m.includes('DEADLINE_EXCEEDED') || m.includes('INTERNAL')) {\n    return 'Rate Limit';\n  }\n  if (m.includes('SAFETY') || m.includes('BLOCKED') || m.includes('RECITATION')) {\n    return 'Safety Block';\n  }\n  if (m.includes('JSON') || m.includes('UNEXPECTED TOKEN') || m.includes('PARSE')) {\n    return 'Invalid JSON';\n  }\n  if (m.includes('TIMEOUT') || m.includes('UNSUPPORTED') || m.includes('SIZE') || m.includes('TOO LARGE')) {\n    return 'Image Processing Error';\n  }\n  if (m.includes('ECONNRESET') || m.includes('ENOTFOUND') || m.includes('NETWORK') || m.includes('ETIMEDOUT')) {\n    return 'Network Error';\n  }\n  return 'Unknown Error';\n}\n\nconst errorType = classify(rawMessage);\nconst willRetry = attempt < 3;\n\nreturn [{\n  json: {\n    barcode:       ctx.barcode,\n    folderId:      ctx.folderId,\n    price:         ctx.price,\n    work:          ctx.work,\n    sareeType:     ctx.sareeType,\n    occasion:      ctx.occasion,\n    style:         ctx.style,\n    fabric:        ctx.fabric,\n    geminiAttempt: attempt,\n    errorType,\n    errorReason: rawMessage,\n    failedNode: 'Analyze an image',\n    willRetry\n  }\n}];\n"
+      },
+      "id": "2e14d0c3-65fb-47ad-bb4b-5892531488f1",
+      "name": "Classify Gemini Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.willRetry }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "b6602b51-866c-4cc3-bb77-3a07976327f2",
+      "name": "Will Retry?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        592,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n// INCREMENT RETRY + SET BACKOFF  (v4)\n// Attempt 1 -> immediate (0s wait already happened)\n// Attempt 2 -> wait 30s before retry\n// Attempt 3 -> wait 60s before retry\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nconst j = $input.first().json;\nconst nextAttempt = (j.geminiAttempt || 1) + 1;\n\n// backoff applies to the attempt we are ABOUT to make:\n// going into attempt 2 -> wait 30s; going into attempt 3 -> wait 60s\nconst backoffSeconds = nextAttempt === 2 ? 5 : (nextAttempt === 3 ? 10 : 0);\n\nreturn [{\n  json: {\n    ...j,\n    geminiAttempt: nextAttempt,\n    backoffSeconds\n  }\n}];\n"
+      },
+      "id": "dac8c6d1-d7a2-45d5-ba67-020623d355f1",
+      "name": "Increment Retry + Backoff",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        816,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "amount": "={{ $json.backoffSeconds }}"
+      },
+      "id": "063449fa-54f0-4a1b-a4e7-1b0c013de6ca",
+      "name": "Wait Before Retry",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        192
+      ],
+      "webhookId": "50d2655d-7c7d-4dbf-b918-185573d4662b"
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n// RESTORE BINARY FOR RETRY  (v5 \u2014 context-safe via Set Context)\n// Re-attaches the originally downloaded image binary before retrying\n// Gemini, since the error-handling branch only carries JSON forward.\n// Binary always comes from \"Download -2 Image\" (the original download,\n// never overwritten). Inventory fields always come from Set Context.\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nconst ctx    = $('Set Context').first().json;\nconst binary = $('Download -5 Image').first().binary || {};\n\nreturn [{\n  json: { ...$input.first().json, ...ctx, geminiAttempt: $input.first().json.geminiAttempt },\n  binary\n}];\n"
+      },
+      "id": "d26b7bb3-3f28-4b97-9205-233a117da5d2",
+      "name": "Restore Binary For Retry",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1264,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n// CLASSIFY FOLDER/DRIVE ERROR  (v5 \u2014 context-safe via Set Context)\n// Handles failures from List Folder Files (e.g. invalid or deleted Folder ID\n// read from the sheet). Barcode and Folder ID always come from Set Context.\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nconst errItem = $input.first().json;\nconst ctx     = $('Set Context').first().json;\n\nconst rawMessage = String(\n  errItem.error?.message || errItem.message || JSON.stringify(errItem)\n).slice(0, 500);\n\nreturn [{\n  json: {\n    barcode:     ctx.barcode,\n    folderId:    ctx.folderId,\n    errorReason: rawMessage,\n    errorType:   'Google Drive Error',\n    failedNode:  'List Folder Files',\n    failedAt:    new Date().toISOString()\n  }\n}];\n"
+      },
+      "id": "c90b613f-0918-4cfa-b973-b74b66d35427",
+      "name": "Classify Folder Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        128,
+        656
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n// SELECT -2 IMAGE  (v5 \u2014 STRICT, no fallback, context-safe via Set Context)\n//\n// RULE: Only the file ending with -2.jpg / -2.jpeg / -2.png / -2.webp is valid.\n// If that file does not exist: imageFound = false \u2192 routes to Mark as Error.\n// The -1 price tag and all other images are NEVER sent to Gemini.\n//\n// Inventory fields (barcode, folderId, price, work, sareeType, occasion,\n// style, fabric) are NOT carried on this item's json \u2014 every downstream\n// node reads them directly from $('Set Context').item.json.* instead.\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nconst ctx     = $('Set Context').first().json;\nconst barcode = ctx.barcode;\nconst files   = $input.all().map(i => i.json);\n\n// Strict: must end with -2.<ext>\nconst primary = files.find(f => /5\\.(jpg|jpeg|png|webp)$/i.test(f.name || ''));\n\nif (!primary) {\n  return [{\n    json: {\n      imageFound: false,\n      barcode,\n      folderId:   ctx.folderId,\n      reason:     '5 image not found in folder (required: barcode-2.jpg/jpeg/png/webp)',\n      failedNode: 'Select 5 Image',\n      errorType:  'Image Processing Error'\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    imageFound:       true,\n    barcode,\n    folderId:         ctx.folderId,\n    primaryImageId:   primary.id,\n    primaryImageName: primary.name\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -976,
+        416
+      ],
+      "id": "8d63e5b4-b438-4421-b7e4-47e34cbaae77",
+      "name": "Select 5 Image",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.primaryImageId }}",
+          "mode": "id"
+        },
+        "options": {
+          "fileName": "={{ $json.primaryImageName }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -528,
+        288
+      ],
+      "id": "5d0d3fb7-bb13-4f4a-b5c4-4d99c190c507",
+      "name": "Download -5 Image",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "T749MOGwq4Zcymuh",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.docTitle + '.docx' }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Set Context').item.json.folderId }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1248,
+        0
+      ],
+      "id": "64aba091-8577-48c1-b8ca-893c99e6360a",
+      "name": "Save DOCX to Drive1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "T749MOGwq4Zcymuh",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2848,
+        656
+      ],
+      "id": "f9e7c90a-77a7-4034-a264-18f0ba27f28b",
+      "name": "Run Workflow"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2848,
+        848
+      ],
+      "id": "c074e5a1-43d3-48b5-bfec-322179708f02",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n// FILTER & NORMALISE SHEET ROWS  (v4)\n//\n// Processes:  Status blank | Pending | Error\n//             Status = Processing AND Processing Started At > 2 hours ago\n// Skips:      Status = Done\n//             Status = Processing AND Processing Started At < 2 hours ago\n//\n// NEW (v4): Reads Folder ID directly from the sheet. Drive folder search /\n// name-matching is no longer used anywhere in this workflow.\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nconst TWO_HOURS_MS = 2 * 60 * 60 * 1000;\nconst now = Date.now();\n\nconst s   = (v) => String(v || '').trim();\nconst arr = (v) => {\n  const str = s(v);\n  if (!str) return [];\n  return str.split(/[,;\\n]+/).map(x => x.trim()).filter(Boolean);\n};\n\nconst rows = $input.all();\nconst processable = [];\n\nfor (const item of rows) {\n  const row = item.json;\n\n  const barcode = s(row['Barcode'] || row['barcode'] || '');\n  if (!barcode) continue;  // skip empty rows\n\n  const folderId = s(row['Folder ID'] || row['folderId'] || row['Folder Id'] || '');\n\n  // Normalise status to Title-case\n  const rawStatus = s(row['Status'] || row['status'] || '');\n  const status = rawStatus.charAt(0).toUpperCase() + rawStatus.slice(1).toLowerCase();\n\n  // \u2500\u2500 Skip logic \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  if (status === 'Done') continue;\n\n  if (status === 'Processing') {\n    const startedAt = s(row['Processing Started At'] || row['processing_started_at'] || '');\n    if (startedAt) {\n      const startedMs = new Date(startedAt).getTime();\n      if (!isNaN(startedMs) && (now - startedMs) < TWO_HOURS_MS) {\n        // Still within 2-hour window \u2014 skip (another execution is likely running)\n        continue;\n      }\n      // Older than 2 hours \u2192 treat as stuck, re-process\n    }\n    // No timestamp \u2192 treat as stuck, re-process\n  }\n\n  // \u2500\u2500 Accepted: blank, Pending, Error, or stuck Processing \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  processable.push({\n    json: {\n      barcode,\n      folderId,        // NEW \u2014 read directly from sheet, replaces Drive search\n      status,\n      processedAt:        s(row['Processed At']           || ''),\n      processingStartedAt:s(row['Processing Started At']  || ''),\n      docUrl:             s(row['Doc URL']                || ''),\n      // \u2500\u2500 Sheet-authoritative product fields \u2500\u2500\n      price:     s(row['Price']       || row['price']      || row['MRP'] || ''),\n      work:      s(row['Work']        || row['work']       || ''),\n      sareeType: arr(row['Saree Type(s)'] || row['Saree Type'] || row['sareeType'] || ''),\n      occasion:  arr(row['Occasion(s)']   || row['Occasion']   || row['occasion']  || ''),\n      style:     arr(row['Style(s)']      || row['Style']      || row['style']     || ''),\n      fabric:    arr(row['Fabric(s)']     || row['Fabric']     || row['fabric']    || ''),\n      imageUrl:  s(row['Image URL']   || row['image_url']  || '')\n      // NOTE: color is NOT read from sheet \u2014 Gemini determines it\n    }\n  });\n}\n\nreturn processable;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2032,
+        752
+      ],
+      "id": "91e6eee8-faa1-41bd-9364-668d73cfd086",
+      "name": "Filter & Normalise Rows"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1888,
+        752
+      ],
+      "id": "4138472c-67e8-443e-9a88-455a2bd49a34",
+      "name": "Split In Batches"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1mJBnSwAqofRqihkTziffZmo2Oe-DOardpfOJc0Acytg",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mJBnSwAqofRqihkTziffZmo2Oe-DOardpfOJc0Acytg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Barcode": "={{ $json.barcode }}",
+            "Status": "Processing",
+            "Processing Started At": "={{ new Date().toISOString() }}"
+          },
+          "matchingColumns": [
+            "Barcode"
+          ],
+          "schema": [
+            {
+              "id": "Barcode",
+              "displayName": "Barcode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Price",
+              "displayName": "Price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Image URL",
+              "displayName": "Image URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Saree Type(s)",
+              "displayName": "Saree Type(s)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Occasion(s)",
+              "displayName": "Occasion(s)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Style(s)",
+              "displayName": "Style(s)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Fabric(s)",
+              "displayName": "Fabric(s)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Work",
+              "displayName": "Work",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Processing Started At",
+              "displayName": "Processing Started At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Processed At",
+              "displayName": "Processed At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Doc URL",
+              "displayName": "Doc URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Folder ID",
+              "displayName": "Folder ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Error Reason",
+              "displayName": "Error Reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Error Type",
+              "displayName": "Error Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Failed Node",
+              "displayName": "Failed Node",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Failed At",
+              "displayName": "Failed At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -1440,
+        480
+      ],
+      "id": "91024c38-0daa-44e1-8978-7a65f4f7f838",
+      "name": "Mark as Processing",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "yd1uzXET3dKsd7Y1",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -1664,
+        864
+      ],
+      "id": "4577a488-9e6e-47fb-95a5-173dd517793f",
+      "name": "Skip \u2013 Already Done"
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n// SET CONTEXT  (v5 \u2014 master context source)\n//\n// Single source of truth for every identifier / inventory field needed for\n// this item. Every downstream node MUST read these values via\n// $('Set Context').item.json.* instead of relying on transient $json fields,\n// which can be overwritten or stripped by Google Drive, Google Sheets,\n// HTTP Request, or Gemini nodes anywhere later in the branch.\n// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nconst row = $input.first().json;\n\nreturn [{\n  json: {\n    barcode:   row.barcode   || '',\n    folderId:  row.folderId  || '',\n    price:     row.price     || '',\n    work:      row.work      || '',\n    sareeType: row.sareeType || [],\n    occasion:  row.occasion  || [],\n    style:     row.style     || [],\n    fabric:    row.fabric    || [],\n    imageUrl:  row.imageUrl  || '',\n    docUrl:    row.docUrl    || ''\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1664,
+        480
+      ],
+      "id": "b5341903-0d1d-41b1-954c-5f39ce9e4fb6",
+      "name": "Set Context"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1mJBnSwAqofRqihkTziffZmo2Oe-DOardpfOJc0Acytg",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mJBnSwAqofRqihkTziffZmo2Oe-DOardpfOJc0Acytg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Barcode": "={{ $json.Barcode }}",
+            "Processing Started At": "={{ new Date().toISOString() }}",
+            "Status": "IN Queue"
+          },
+          "matchingColumns": [
+            "Barcode"
+          ],
+          "schema": [
+            {
+              "id": "Barcode",
+              "displayName": "Barcode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Price",
+              "displayName": "Price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Image URL",
+              "displayName": "Image URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Saree Type(s)",
+              "displayName": "Saree Type(s)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Occasion(s)",
+              "displayName": "Occasion(s)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Style(s)",
+              "displayName": "Style(s)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Fabric(s)",
+              "displayName": "Fabric(s)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Work",
+              "displayName": "Work",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Processing Started At",
+              "displayName": "Processing Started At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Processed At",
+              "displayName": "Processed At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Doc URL",
+              "displayName": "Doc URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Folder ID",
+              "displayName": "Folder ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Error Reason",
+              "displayName": "Error Reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Error Type",
+              "displayName": "Error Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Failed Node",
+              "displayName": "Failed Node",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Failed At",
+              "displayName": "Failed At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -2400,
+        752
+      ],
+      "id": "92930829-2bd7-497a-b3a9-f7459fa00f47",
+      "name": "Mark as IN Queue",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "yd1uzXET3dKsd7Y1",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1mJBnSwAqofRqihkTziffZmo2Oe-DOardpfOJc0Acytg",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mJBnSwAqofRqihkTziffZmo2Oe-DOardpfOJc0Acytg/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "Pending"
+            },
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "Error"
+            }
+          ]
+        },
+        "combineFilters": "OR",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -2592,
+        752
+      ],
+      "id": "91b58103-cee5-4d02-91e6-75ef68a142d3",
+      "name": "Read Google Sheet 2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "yd1uzXET3dKsd7Y1",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1mJBnSwAqofRqihkTziffZmo2Oe-DOardpfOJc0Acytg",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mJBnSwAqofRqihkTziffZmo2Oe-DOardpfOJc0Acytg/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Barcode",
+              "lookupValue": "={{ $json.Barcode }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -2224,
+        752
+      ],
+      "id": "2db7527d-8a44-41bd-aa85-a620df86632c",
+      "name": "Read Google Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "yd1uzXET3dKsd7Y1",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "List Folder Files": {
+      "main": [
+        [
+          {
+            "node": "Select 5 Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Classify Folder Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Found?": {
+      "main": [
+        [
+          {
+            "node": "Download -5 Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Collect Error Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "Parse and Merge AI Product Data1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Classify Gemini Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse and Merge AI Product Data1": {
+      "main": [
+        [
+          {
+            "node": "product.json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "product.json": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "Generate DOCX Directly",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Doc URL": {
+      "main": [
+        [
+          {
+            "node": "Mark as Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark as Done": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Error Context": {
+      "main": [
+        [
+          {
+            "node": "Mark as Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark as Error": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait4": {
+      "main": [
+        [
+          {
+            "node": "Init Gemini Attempt Counter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate DOCX Directly": {
+      "main": [
+        [
+          {
+            "node": "Save DOCX to Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Init Gemini Attempt Counter": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Gemini Error": {
+      "main": [
+        [
+          {
+            "node": "Will Retry?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Will Retry?": {
+      "main": [
+        [
+          {
+            "node": "Increment Retry + Backoff",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Collect Error Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Increment Retry + Backoff": {
+      "main": [
+        [
+          {
+            "node": "Wait Before Retry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Before Retry": {
+      "main": [
+        [
+          {
+            "node": "Restore Binary For Retry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Restore Binary For Retry": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Folder Error": {
+      "main": [
+        [
+          {
+            "node": "Collect Error Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select 5 Image": {
+      "main": [
+        [
+          {
+            "node": "Image Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download -5 Image": {
+      "main": [
+        [
+          {
+            "node": "Wait4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save DOCX to Drive1": {
+      "main": [
+        [
+          {
+            "node": "Build Doc URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Workflow": {
+      "main": [
+        [
+          {
+            "node": "Read Google Sheet 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read Google Sheet 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter & Normalise Rows": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches": {
+      "main": [
+        [
+          {
+            "node": "Skip \u2013 Already Done",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Context": {
+      "main": [
+        [
+          {
+            "node": "Mark as Processing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark as Processing": {
+      "main": [
+        [
+          {
+            "node": "List Folder Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark as IN Queue": {
+      "main": [
+        [
+          {
+            "node": "Read Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Google Sheet 2": {
+      "main": [
+        [
+          {
+            "node": "Mark as IN Queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Google Sheet": {
+      "main": [
+        [
+          {
+            "node": "Filter & Normalise Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "5ffe5e3c-3523-490a-88b0-3db940b70d00",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "01e9baa982b56a3aff138137f9ed0fab84e484c948befa99b040a4a876cf39ba"
+  },
+  "nodeGroups": [],
+  "id": "6XeIh4cLJoh9RVgZ",
+  "tags": []
+}

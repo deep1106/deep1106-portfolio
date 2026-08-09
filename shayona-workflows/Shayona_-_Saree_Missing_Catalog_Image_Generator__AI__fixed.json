@@ -1,0 +1,1043 @@
+{
+  "name": "Shayona - Saree Missing Catalog Image Generator (AI)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Setup Required Before Activating\n1. **Set Configuration** node: fill ROOT_FOLDER_ID (parent Drive folder containing all barcode folders), GEMINI_API_MODEL (e.g. gemini-2.5-flash-image), ERROR_LOG_SPREADSHEET_ID, ERROR_LOG_SHEET_NAME.\n2. Attach a **Google Drive OAuth2** credential to every Google Drive node (search/download/upload/update).\n3. Create a **Generic Query Auth** credential named '<REDACTED>' with Query Parameter Name = `key` and Value = your Generative Language API key. Attach it to both Gemini HTTP Request nodes.\n4. Attach a **Google Sheets OAuth2** credential to the error log Append node.\n5. Image roles are fixed by filename only: 1.png=Barcode/Tag, 4.png=Folded Saree, 5.png=Saree Flat (input), 6.png=Blouse Fabric (input). 5.png and 6.png are downloaded and sent directly to Gemini, which generates 2.png (catalog image) in one step. 1.png and 4.png are never touched.\n6. Retries: Drive ops x3, AI generation x3 (with continueErrorOutput + 5s wait), upload/update x3.",
+        "height": 420,
+        "width": 460
+      },
+      "id": "7c8c72d1-84be-4044-83ea-6b021faecbe8",
+      "name": "Setup Instructions",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "5ffaa4f1-60b0-416d-b916-fd397446e444",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        256,
+        1680
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 30
+            }
+          ]
+        }
+      },
+      "id": "8c5b6646-dd83-4ad8-bd38-f05218bd040e",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        256,
+        1872
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "92035f60-a19b-452c-8fca-23063e3960ec",
+              "name": "ROOT_FOLDER_ID",
+              "type": "string",
+              "value": "<REDACTED>"
+            },
+            {
+              "id": "10c373fb-1b97-41f5-ae96-8cd88992fd9f",
+              "name": "GEMINI_API_MODEL",
+              "type": "string",
+              "value": "gemini-3-pro-image (Nano Banana Pro)"
+            },
+            {
+              "id": "b4d8c427-6575-4814-a0de-0abf77776eef",
+              "name": "ERROR_LOG_SPREADSHEET_ID",
+              "type": "string",
+              "value": "<REDACTED>"
+            },
+            {
+              "id": "ebc75daf-2c8f-4345-9df7-5abb9c19f413",
+              "name": "ERROR_LOG_SHEET_NAME",
+              "type": "string",
+              "value": "ErrorLog"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "97c0b55d-d4ba-4677-97ec-1bedf1cdd5a3",
+      "name": "Set Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        480,
+        1776
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $json.ROOT_FOLDER_ID }}",
+            "mode": "id"
+          },
+          "whatToSearch": "folders"
+        },
+        "options": {}
+      },
+      "id": "dd0ca3dd-d9c8-4653-b12e-c037a81c259a",
+      "name": "List Barcode Folders",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        704,
+        1776
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": <REDACTED>,
+          "name": <REDACTED>
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const folders = $input.all();\nconst results = [];\nfor (const item of folders) {\n  const f = item.json;\n  if (f.mimeType && f.mimeType !== 'application/vnd.google-apps.folder') continue;\n  if (!f.id) continue;\n  results.push({\n    json: {\n      barcodeFolderId: f.id,\n      barcodeName: f.name || f.id\n    }\n  });\n}\nreturn results;"
+      },
+      "id": "2bf297d4-1175-49a2-84b5-c8ecb977e197",
+      "name": "Build Barcode Folder List",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        928,
+        1776
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "d3d8217e-c015-4f69-8a19-d504f8eff4c0",
+      "name": "Loop Barcode Folders",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1152,
+        1776
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "={{ $json.barcodeFolderId }}"
+          },
+          "whatToSearch": "files"
+        },
+        "options": {}
+      },
+      "id": "88f13699-4002-4e91-a5bc-0410c13445a6",
+      "name": "List Files In Barcode Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1376,
+        912
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": <REDACTED>,
+          "name": <REDACTED>
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const files = $input.all();\nconst folderId = $('Loop Barcode Folders').item.json.barcodeFolderId;\nconst barcodeName = $('Loop Barcode Folders').item.json.barcodeName;\n\nconst allFiles = files.map(item => item.json).filter(f => f && f.name);\n\nfunction findByRole(role) {\n  const exact = allFiles.find(f => f.name.trim().toLowerCase() === `${role}.png`);\n  if (exact) return exact;\n  const re = new RegExp(`^.+\\\\s*-\\\\s*${role}\\\\.png$`, 'i');\n  return allFiles.find(f => re.test(f.name.trim())) || null;\n}\n\nconst sareeFile = findByRole(5);\nconst blouseFile = findByRole(6);\nconst existing2 = findByRole(2);\n\nconst hasSaree = !!sareeFile;\nconst hasBlouseFabric = !!blouseFile;\n\nlet missingReason = '';\nif (!hasSaree && !hasBlouseFabric) missingReason = 'Missing 5.png and 6.png';\nelse if (!hasSaree) missingReason = 'Missing 5.png';\nelse if (!hasBlouseFabric) missingReason = 'Missing 6.png';\n\nreturn [{\n  json: {\n    barcodeFolderId: folderId,\n    barcodeName: barcodeName,\n    hasSaree,\n    hasBlouseFabric,\n    hasRequiredImages: hasSaree && hasBlouseFabric,\n    sareeFileId: sareeFile ? sareeFile.id : null,\n    blouseFabricFileId: blouseFile ? blouseFile.id : null,\n    existing2PngId: existing2 ? existing2.id : null,\n    missingReason\n  }\n}];"
+      },
+      "id": "14f8db45-1415-4e86-b00f-1aebc0ea942d",
+      "name": "Map & Validate Images",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        912
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "e10c7520-cf8b-4536-aac4-e45e491d4db1",
+              "leftValue": "={{ $json.hasRequiredImages }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "909b65b7-f549-4114-b936-e0823ed452fc",
+      "name": "Has Required Images?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1824,
+        912
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const v = $json;\nreturn [{\n  json: {\n    barcodeFolderId: v.barcodeFolderId,\n    barcodeName: v.barcodeName,\n    errorReason: v.missingReason,\n    errorType: 'Missing Source Image',\n    failedNode: 'Map & Validate Images',\n    failedAt: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "460c4ef6-c480-4caa-a401-930e434ba4a7",
+      "name": "Build Missing Image Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4736,
+        1440
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nif (!staticData.errorLog) staticData.errorLog = [];\nfor (const item of $input.all()) {\n  staticData.errorLog.push(item.json);\n}\nreturn $input.all();"
+      },
+      "id": "96b52099-10cf-4494-8b74-750d2a10fe8c",
+      "name": "Log Error To Static Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4960,
+        1152
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.blouseFabricFileId }}"
+        },
+        "options": {}
+      },
+      "id": "bff3ea90-147e-4af7-8f63-3645e54caa7c",
+      "name": "Download Blouse Fabric (6.png)",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2048,
+        816
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": <REDACTED>,
+          "name": <REDACTED>
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.sareeFileId }}"
+        },
+        "options": {}
+      },
+      "id": "299c7889-5599-4f6f-92e5-7ce814456434",
+      "name": "Download Saree Image (5.png)",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3616,
+        624
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": <REDACTED>,
+          "name": <REDACTED>
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const item = $input.item;\nconst sareeBinary = $('Download Saree Image (5.png)').item.binary && $('Download Saree Image (5.png)').item.binary.data;\nconst blouseBinary = $('Download Blouse Fabric (6.png)').item.binary && $('Download Blouse Fabric (6.png)').item.binary.data;\n\nif (!sareeBinary) {\n  throw new Error('Saree image (5.png) binary data not found');\n}\nif (!blouseBinary) {\n  throw new Error('Blouse fabric image (6.png) binary data not found');\n}\n\nreturn {\n  json: { ...item.json },\n  binary: {\n    saree: sareeBinary,\n    blouse: blouseBinary\n  }\n};"
+      },
+      "id": "788df2b1-5977-43ba-89cf-6a4125fbcd48",
+      "name": "Prepare Catalog Images",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3840,
+        624
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const item = $input.item;\nconst err = item.json.error || item.json;\nconst message = (typeof err === 'string') ? err : (err.message || JSON.stringify(err));\nconst statusCode = (item.json.error && (item.json.error.httpCode || item.json.error.statusCode)) || null;\nconst lower = (message || '').toLowerCase();\n\nlet errorType = 'Network Error';\nif (statusCode === 429 || lower.includes('rate limit') || lower.includes('quota')) {\n  errorType = 'Rate Limit';\n} else if (lower.includes('safety') || lower.includes('blocked') || lower.includes('policy')) {\n  errorType = 'Safety Block';\n} else if (lower.includes('json') || lower.includes('parse')) {\n  errorType = 'Invalid JSON';\n} else if (lower.includes('image') && (lower.includes('process') || lower.includes('decode'))) {\n  errorType = 'Image Processing Error';\n}\n\nconst v = $('Map & Validate Images').item.json;\n\nreturn {\n  json: {\n    barcodeFolderId: v.barcodeFolderId,\n    barcodeName: v.barcodeName,\n    errorReason: message,\n    errorType,\n    failedNode: 'Generate Catalog Image (Gemini)',\n    failedAt: new Date().toISOString()\n  }\n};"
+      },
+      "id": "45eb036a-a262-42bb-8719-b93706853c76",
+      "name": "Classify Catalog Generation Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4736,
+        864
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const item = $input.item;\nconst context = $('Map & Validate Images').item.json;\nconst binaryKeys = Object.keys(item.binary || {});\nconst hasImage = binaryKeys.length > 0;\n\nconst out = {\n  json: {\n    ...context,\n    hasGeneratedCatalogImage: hasImage,\n    catalogExtractionError: hasImage ? null : 'Gemini node returned no binary image data'\n  }\n};\nif (hasImage) {\n  out.binary = item.binary;\n}\nreturn out;"
+      },
+      "id": "c0c565c3-7104-44ad-aeb3-6ad72b749ba6",
+      "name": "Extract Generated Catalog Image",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4288,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "840debc2-e629-4be3-b1d3-4fff4529589e",
+              "leftValue": "={{ $json.hasGeneratedCatalogImage }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6819b76f-d979-49e1-960c-b62172364dc7",
+      "name": "Catalog Image Extracted?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        4512,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const v = $input.item.json;\nconst reason = v.catalogExtractionError || 'Unknown extraction error';\nconst lower = reason.toLowerCase();\nconst errorType = (lower.includes('safety') || lower.includes('block')) ? 'Safety Block' : 'Image Processing Error';\n\nreturn {\n  json: {\n    barcodeFolderId: v.barcodeFolderId,\n    barcodeName: v.barcodeName,\n    errorReason: reason,\n    errorType,\n    failedNode: 'Extract Generated Catalog Image',\n    failedAt: new Date().toISOString()\n  }\n};"
+      },
+      "id": "1a2aa333-ccc3-431f-8e1c-e7f8f0a86f01",
+      "name": "Build Catalog Extraction Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4736,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "35421d06-fa7a-48cc-9662-1e30b649bef6",
+              "leftValue": "={{ $json.existing2PngId }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "76c39f29-4185-4efa-aa32-8ce3f2f7d8af",
+      "name": "2.png Already Exists?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        4736,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.existing2PngId }}"
+        },
+        "options": {}
+      },
+      "id": "b83e11c8-f7b4-4d30-80e6-a5d9c83ee4df",
+      "name": "Update 2.png",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4960,
+        336
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": <REDACTED>,
+          "name": <REDACTED>
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Map & Validate Images').item.json.barcodeName + '-2.png' }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.barcodeFolderId }}"
+        },
+        "options": {}
+      },
+      "id": "526d7988-640a-4a62-85be-9d8a27047a02",
+      "name": "Upload 2.png",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4960,
+        528
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": <REDACTED>,
+          "name": <REDACTED>
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nif (!staticData.successLog) staticData.successLog = [];\nconst context = $('Map & Validate Images').item.json;\nconst entry = {\n  barcodeFolderId: context.barcodeFolderId,\n  barcodeName: context.barcodeName,\n  status: 'Done',\n  completedAt: new Date().toISOString()\n};\nstaticData.successLog.push(entry);\nreturn { json: entry };"
+      },
+      "id": "10ec9eed-3750-45e4-9924-fa31bd320201",
+      "name": "Log Success To Static Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5184,
+        528
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "698bd8c7-9368-432d-80da-4c1e7c3cd076",
+      "name": "Limit To 1",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        1376,
+        1712
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nconst errors = staticData.errorLog || [];\nconst successes = staticData.successLog || [];\n\nreturn [{\n  json: {\n    totalProcessed: errors.length + successes.length,\n    successCount: successes.length,\n    errorCount: errors.length,\n    hasErrors: errors.length > 0,\n    successes,\n    errors,\n    completedAt: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "b621ca45-744e-46ae-916b-e185b7465dd0",
+      "name": "Compile Final Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        1712
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "d12eeaad-a288-43d5-a52c-6604eb172d7e",
+              "leftValue": "={{ $json.hasErrors }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0cfc4258-81a8-4ad0-a55a-3037476ffaab",
+      "name": "Has Errors To Log?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1824,
+        1712
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const errors = $json.errors || [];\nreturn errors.map(e => ({ json: e }));"
+      },
+      "id": "812f11d2-5ea7-4fc5-acbe-df287da1a955",
+      "name": "Split Error Entries For Sheet",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2048,
+        1584
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Set Configuration').first().json.ERROR_LOG_SPREADSHEET_ID }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "={{ $('Set Configuration').first().json.ERROR_LOG_SHEET_NAME }}"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [
+            "ErrorLog"
+          ],
+          "schema": [
+            {
+              "id": "ErrorLog",
+              "displayName": "ErrorLog",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "d70263ae-f312-43c8-ae88-cb6ba272fc01",
+      "name": "Append Errors To Log Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        2272,
+        1584
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hRsgudIzdSD80ooI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "2df5e2e2-039a-44f6-86a6-f4cb8119b58c",
+      "name": "Workflow Complete",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2496,
+        1712
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "edit",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3-pro-image",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3-pro-image (Nano Banana Pro)"
+        },
+        "prompt": "TASK\n\nCreate a premium Indian ecommerce catalog photograph.\n\nINPUT IMAGES\n\nImage 1:\nThe original saree.\n\nImage 2:\nThe original blouse fabric piece belonging to that saree.\n\nSTRICT PRESERVATION\n\nThe saree image is the primary source of truth.\n\nPreserve EXACTLY:\n\n- border\n- pallu\n- motifs\n- embroidery\n- weaving\n- texture\n- folds\n- shine\n- print\n- colors\n\nDo NOT redesign.\n\nDo NOT recolor.\n\nDo NOT simplify embroidery.\n\nDo NOT invent new patterns.\n\nBLOUSE\n\nThe second image is NOT a stitched blouse.\n\nIt is the original blouse fabric piece.\n\nConvert this fabric into a realistic stitched blouse worn by the model.\n\nPreserve EXACTLY:\n\n- fabric\n- color\n- embroidery\n- print\n- weaving\n- texture\n- border\n\nThe blouse must appear naturally stitched while remaining visually identical to the supplied fabric.\n\nMODEL\n\nElegant Indian female.\n\nFront-facing.\n\nStanding pose.\n\nEntire saree visible.\n\nNatural drape.\n\nPallu completely visible.\n\nProfessional ecommerce pose.\n\nCorrect anatomy.\n\nNo duplicated limbs.\n\nNo missing fingers.\n\nNo extra people.\n\nBACKGROUND\n\nPure white studio background.\n\nSoft studio lighting.\n\nSoft shadow.\n\nNo props.\n\nNo furniture.\n\nNo jewellery.\n\nNo handbag.\n\nNo flowers.\n\nNo watermark.\n\nNo logo.\n\nNo text.\n\nOUTPUT\n\nOne premium Shopify-ready catalog image.",
+        "images": {
+          "values": [
+            {
+              "binaryPropertyName": "saree"
+            },
+            {
+              "binaryPropertyName": "blouse"
+            }
+          ]
+        },
+        "options": {
+          "binaryPropertyOutput": "data"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        4064,
+        624
+      ],
+      "id": "922b0c03-83fb-41d6-8b4d-6014569223c5",
+      "name": "Generate Catalog Image (Gemini)",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "uncx7ySzLyXhcTWz",
+          "name": "shayona paid"
+        }
+      },
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Configuration": {
+      "main": [
+        [
+          {
+            "node": "List Barcode Folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Barcode Folders": {
+      "main": [
+        [
+          {
+            "node": "Build Barcode Folder List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Barcode Folder List": {
+      "main": [
+        [
+          {
+            "node": "Loop Barcode Folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Barcode Folders": {
+      "main": [
+        [
+          {
+            "node": "Limit To 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "List Files In Barcode Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Files In Barcode Folder": {
+      "main": [
+        [
+          {
+            "node": "Map & Validate Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map & Validate Images": {
+      "main": [
+        [
+          {
+            "node": "Has Required Images?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Required Images?": {
+      "main": [
+        [
+          {
+            "node": "Download Saree Image (5.png)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Missing Image Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Missing Image Error": {
+      "main": [
+        [
+          {
+            "node": "Log Error To Static Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Error To Static Data": {
+      "main": [
+        [
+          {
+            "node": "Loop Barcode Folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Blouse Fabric (6.png)": {
+      "main": [
+        [
+          {
+            "node": "Prepare Catalog Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Saree Image (5.png)": {
+      "main": [
+        [
+          {
+            "node": "Download Blouse Fabric (6.png)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Catalog Generation Error": {
+      "main": [
+        [
+          {
+            "node": "Log Error To Static Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Generated Catalog Image": {
+      "main": [
+        [
+          {
+            "node": "Catalog Image Extracted?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Catalog Image Extracted?": {
+      "main": [
+        [
+          {
+            "node": "2.png Already Exists?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Catalog Extraction Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Catalog Extraction Error": {
+      "main": [
+        [
+          {
+            "node": "Log Error To Static Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2.png Already Exists?": {
+      "main": [
+        [
+          {
+            "node": "Update 2.png",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Upload 2.png",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update 2.png": {
+      "main": [
+        [
+          {
+            "node": "Log Success To Static Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload 2.png": {
+      "main": [
+        [
+          {
+            "node": "Log Success To Static Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Success To Static Data": {
+      "main": [
+        [
+          {
+            "node": "Loop Barcode Folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit To 1": {
+      "main": [
+        [
+          {
+            "node": "Compile Final Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compile Final Report": {
+      "main": [
+        [
+          {
+            "node": "Has Errors To Log?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Errors To Log?": {
+      "main": [
+        [
+          {
+            "node": "Split Error Entries For Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Workflow Complete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Error Entries For Sheet": {
+      "main": [
+        [
+          {
+            "node": "Append Errors To Log Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Errors To Log Sheet": {
+      "main": [
+        [
+          {
+            "node": "Workflow Complete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Catalog Image (Gemini)": {
+      "main": [
+        [
+          {
+            "node": "Extract Generated Catalog Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Classify Catalog Generation Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Catalog Images": {
+      "main": [
+        [
+          {
+            "node": "Generate Catalog Image (Gemini)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "9cb4c7cc-443a-4a1e-8504-617c8ebae08d",
+  "meta": {
+    "instanceId": "552c31719a999e81101c0449b0e6cbf96245ec33215203874987912ed56dfeb3"
+  },
+  "id": "Ku1OqJ1INNQZSElj",
+  "tags": []
+}
