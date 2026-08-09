@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep H Bhavsar — AI Automation Engineer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #07080a;
+            --bg-surface: #101111;
+            --bg-card: #1b1c1e;
+            --text-primary: #f9f9f9;
+            --text-secondary: #9c9c9d;
+            --text-muted: #6a6b6c;
+            --border: rgba(255, 255, 255, 0.06);
+            --accent-red: #FF6363;
+            --accent-blue: #55b3ff;
+            --accent-green: #5fc992;
+            --accent-yellow: #ffbc33;
+            --font-primary: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-primary);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Grid Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            padding: 20px 60px;
+            background: rgba(7, 8, 10, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            letter-spacing: 0.3px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-cta {
+            background: rgba(255, 255, 255, 0.815);
+            color: var(--bg-primary);
+            padding: 8px 20px;
+            border-radius: 86px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .nav-cta:hover {
+            background: rgba(255, 255, 255, 1);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 120px 60px 80px;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            width: 100%;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 99, 99, 0.1);
+            border: 1px solid rgba(255, 99, 99, 0.2);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent-red);
+            margin-bottom: 24px;
+            letter-spacing: 0.3px;
+        }
+
+        .hero-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .hero h1 {
+            font-size: 64px;
+            font-weight: 600;
+            line-height: 1.1;
+            letter-spacing: 0px;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            max-width: 700px;
+            letter-spacing: 0.2px;
+        }
+
+        .hero-cta-group {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 60px;
+        }
+
+        .btn-primary {
+            background: rgba(255, 255, 255, 0.815);
+            color: var(--bg-primary);
+            padding: 12px 28px;
+            border-radius: 86px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            padding: 12px 28px;
+            border-radius: 86px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            padding: 32px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: var(--font-mono);
+            font-size: 32px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            letter-spacing: 0.2px;
+        }
+
+        /* Section Styles */
+        section {
+            padding: 120px 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-header {
+            margin-bottom: 60px;
+        }
+
+        .section-tag {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--accent-blue);
+            letter-spacing: 0.3px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .section-title {
+            font-size: 48px;
+            font-weight: 600;
+            line-height: 1.2;
+            letter-spacing: 0px;
+            margin-bottom: 16px;
+        }
+
+        .section-description {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 700px;
+            letter-spacing: 0.2px;
+        }
+
+        /* About Section */
+        .about {
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .about-text p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .skill-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .skill-item:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .skill-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 99, 99, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            font-size: 20px;
+        }
+
+        .skill-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .skill-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Projects Section */
+        .projects {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .project-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .project-card:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-4px);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 16px;
+        }
+
+        .project-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 99, 99, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .project-arrow {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .project-card:hover .project-arrow {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .project-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 0px;
+        }
+
+        .project-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .project-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tech-tag {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: var(--font-mono);
+        }
+
+        /* Startup Idea Section */
+        .startup {
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .startup-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .startup-card {
+            background: linear-gradient(135deg, rgba(255, 99, 99, 0.05) 0%, rgba(85, 179, 255, 0.05) 100%);
+            border: 1px solid rgba(255, 99, 99, 0.1);
+            border-radius: 20px;
+            padding: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .startup-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 99, 99, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .startup-title {
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            letter-spacing: 0px;
+        }
+
+        .startup-desc {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            max-width: 800px;
+            line-height: 1.8;
+        }
+
+        .startup-modules {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .module {
+            background: rgba(7, 8, 10, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .module-number {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-red);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            color: white;
+        }
+
+        .module-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .module-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Contact Section */
+        .contact {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+        }
+
+        .contact-info h3 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .contact-info p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+
+        .contact-links {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .contact-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .contact-link:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(4px);
+        }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .contact-details {
+            flex: 1;
+        }
+
+        .contact-type {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .contact-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Contact Form */
+        .contact-form {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            letter-spacing: 0.2px;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: var(--text-primary);
+            font-family: var(--font-primary);
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(85, 179, 255, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-submit {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.815);
+            color: var(--bg-primary);
+            padding: 12px 28px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .form-submit:hover {
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .form-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 60px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .footer-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            letter-spacing: 0.2px;
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            nav { padding: 20px 30px; }
+            .nav-links { display: none; }
+            section { padding: 80px 30px; }
+            .hero { padding: 120px 30px 80px; }
+            .hero h1 { font-size: 42px; }
+            .about-grid,
+            .projects-grid,
+            .startup-modules,
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-in {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-logo">&lt;DB/&gt;</div>
+        <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#startup">Startup</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <a href="#contact" class="nav-cta">Get In Touch</a>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span>Available for opportunities</span>
+            </div>
+            <h1>Deep H Bhavsar</h1>
+            <p class="hero-subtitle">
+                AI Automation Engineer | N8N Workflow Specialist | Full-Stack Developer
+                Building intelligent systems at the intersection of AI, automation, and blockchain.
+            </p>
+            <div class="hero-cta-group">
+                <a href="#projects" class="btn-primary">
+                    View Projects
+                    <span>→</span>
+                </a>
+                <a href="#contact" class="btn-secondary">Contact Me</a>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-value">5+</div>
+                    <div class="stat-label">Projects Built</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">MSC-IT</div>
+                    <div class="stat-label">Gujarat Vidyapith</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">AI/ML</div>
+                    <div class="stat-label">Specialization</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label">Passion</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="about-grid">
+            <div class="about-text">
+                <div class="section-tag">About Me</div>
+                <h2 class="section-title">Building the future with AI & automation</h2>
+                <p>
+                    I'm an MSC-IT student at Gujarat Vidyapith with a deep passion for Artificial Intelligence, 
+                    Blockchain technologies, and Financial Technology. My journey spans from developing intelligent 
+                    desktop assistants to building complex n8n automation workflows for real businesses.
+                </p>
+                <p>
+                    Currently focused on creating AI-powered automation platforms that bridge the gap between 
+                    manual processes and intelligent systems. I believe in the power of open-source models 
+                    and workflow orchestration to democratize AI for businesses of all sizes.
+                </p>
+            </div>
+            <div class="skills-grid">
+                <div class="skill-item">
+                    <div class="skill-icon">🤖</div>
+                    <div class="skill-name">AI/ML Engineering</div>
+                    <div class="skill-desc">GenAI, LLMs, Computer Vision</div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">⚡</div>
+                    <div class="skill-name">N8N Automation</div>
+                    <div class="skill-desc">Workflow orchestration, RAG, agents</div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">💻</div>
+                    <div class="skill-name">Full-Stack Dev</div>
+                    <div class="skill-desc">Python, JavaScript, TypeScript</div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">⛓️</div>
+                    <div class="skill-name">Blockchain</div>
+                    <div class="skill-desc">Crypto, Web3, FinTech</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects">
+        <div class="projects">
+            <div class="section-header">
+                <div class="section-tag">Projects</div>
+                <h2 class="section-title">Featured Work</h2>
+                <p class="section-description">
+                    A selection of projects showcasing my expertise in AI, automation, and full-stack development.
+                </p>
+            </div>
+            <div class="projects-grid">
+                <a href="https://github.com/deep1106/Python-For-Data-science-MOC-GVP" class="project-card" target="_blank">
+                    <div class="project-header">
+                        <div class="project-icon">📊</div>
+                        <div class="project-arrow">↗</div>
+                    </div>
+                    <h3 class="project-title">Python For Data Science</h3>
+                    <p class="project-desc">
+                        Comprehensive Python data science materials and coursework from GVP, covering 
+                        data analysis, visualization, and machine learning fundamentals.
+                    </p>
+                    <div class="project-tech">
+                        <span class="tech-tag">Python</span>
+                        <span class="tech-tag">Data Science</span>
+                        <span class="tech-tag">Pandas</span>
+                    </div>
+                </a>
+
+                <a href="https://github.com/deep1106/desktot-assistant" class="project-card" target="_blank">
+                    <div class="project-header">
+                        <div class="project-icon">🎙️</div>
+                        <div class="project-arrow">↗</div>
+                    </div>
+                    <h3 class="project-title">Desktop Voice Assistant</h3>
+                    <p class="project-desc">
+                        AI-based personal assistant using Python with voice recognition and automation 
+                        capabilities for desktop tasks and productivity.
+                    </p>
+                    <div class="project-tech">
+                        <span class="tech-tag">Python</span>
+                        <span class="tech-tag">AI</span>
+                        <span class="tech-tag">Voice</span>
+                    </div>
+                </a>
+
+                <a href="https://github.com/deep1106/ChatGPT-Clone" class="project-card" target="_blank">
+                    <div class="project-header">
+                        <div class="project-icon">💬</div>
+                        <div class="project-arrow">↗</div>
+                    </div>
+                    <h3 class="project-title">ChatGPT Clone</h3>
+                    <p class="project-desc">
+                        Custom ChatGPT-style interface built with modern web technologies, 
+                        demonstrating frontend skills and API integration.
+                    </p>
+                    <div class="project-tech">
+                        <span class="tech-tag">JavaScript</span>
+                        <span class="tech-tag">CSS</span>
+                        <span class="tech-tag">UI/UX</span>
+                    </div>
+                </a>
+
+                <a href="https://github.com/deep1106/Car_Rental_System" class="project-card" target="_blank">
+                    <div class="project-header">
+                        <div class="project-icon">🚗</div>
+                        <div class="project-arrow">↗</div>
+                    </div>
+                    <h3 class="project-title">Car Rental System</h3>
+                    <p class="project-desc">
+                        Full-featured car rental system in C with user authentication, 
+                        vehicle management, and rental tracking functionality.
+                    </p>
+                    <div class="project-tech">
+                        <span class="tech-tag">C</span>
+                        <span class="tech-tag">Database</span>
+                        <span class="tech-tag">Auth</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Startup Idea Section -->
+    <section id="startup" class="startup">
+        <div class="startup-container">
+            <div class="section-header">
+                <div class="section-tag">Startup Vision</div>
+                <h2 class="section-title">AI Platform for Enterprise Automation</h2>
+            </div>
+            <div class="startup-card">
+                <h3 class="startup-title">Workflow Generation + Private AI Platform</h3>
+                <p class="startup-desc">
+                    A two-module platform that transforms how businesses adopt AI. Module 1 enables users 
+                    to automate tasks by recording their screen and explaining their workflow—AI generates 
+                    ready-to-use n8n workflows or intelligent agents. Module 2 delivers enterprise-grade 
+                    private AI deployments using open-source models, ensuring data privacy and regulatory compliance.
+                </p>
+                <div class="startup-modules">
+                    <div class="module">
+                        <div class="module-header">
+                            <div class="module-number">1</div>
+                            <div class="module-title">B2C/SMB Automation</div>
+                        </div>
+                        <p class="module-desc">
+                            Screen recording + voice → AI-generated workflows and agents. 
+                            Democratizing automation for freelancers, students, and small businesses.
+                        </p>
+                    </div>
+                    <div class="module">
+                        <div class="module-header">
+                            <div class="module-number">2</div>
+                            <div class="module-title">Enterprise Private AI</div>
+                        </div>
+                        <p class="module-desc">
+                            Secure, on-premise AI deployments using open-source LLMs, RAG, and agents. 
+                            Complete privacy for banks, hospitals, and government organizations.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="contact-grid">
+            <div class="contact-info">
+                <div class="section-tag">Contact</div>
+                <h2 class="section-title">Let's Connect</h2>
+                <p>
+                    I'm always open to discussing new opportunities, innovative projects, 
+                    or potential collaborations in AI, automation, and technology.
+                </p>
+                <div class="contact-links">
+                    <a href="mailto:deep0611.db@gmail.com" class="contact-link">
+                        <div class="contact-icon">✉</div>
+                        <div class="contact-details">
+                            <div class="contact-type">Email</div>
+                            <div class="contact-value">deep0611.db@gmail.com</div>
+                        </div>
+                    </a>
+                    <a href="https://www.linkedin.com/in/deep-bhavsar-aaba3927a/" class="contact-link" target="_blank">
+                        <div class="contact-icon">💼</div>
+                        <div class="contact-details">
+                            <div class="contact-type">LinkedIn</div>
+                            <div class="contact-value">deep-bhavsar-aaba3927a</div>
+                        </div>
+                    </a>
+                    <a href="https://github.com/deep1106" class="contact-link" target="_blank">
+                        <div class="contact-icon">⚡</div>
+                        <div class="contact-details">
+                            <div class="contact-type">GitHub</div>
+                            <div class="contact-value">@deep1106</div>
+                        </div>
+                    </a>
+                    <a href="https://x.com/Deep6112003" class="contact-link" target="_blank">
+                        <div class="contact-icon">𝕏</div>
+                        <div class="contact-details">
+                            <div class="contact-type">Twitter / X</div>
+                            <div class="contact-value">@Deep6112003</div>
+                        </div>
+                    </a>
+                    <a href="https://www.instagram.com/deep__0611__" class="contact-link" target="_blank">
+                        <div class="contact-icon">📸</div>
+                        <div class="contact-details">
+                            <div class="contact-type">Instagram</div>
+                            <div class="contact-value">@deep__0611__</div>
+                        </div>
+                    </a>
+                    <a href="tel:+919313719538" class="contact-link">
+                        <div class="contact-icon">📱</div>
+                        <div class="contact-details">
+                            <div class="contact-type">Phone</div>
+                            <div class="contact-value">+91 93137 19538</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="contact-form-wrapper">
+                <form id="contactForm" class="contact-form">
+                    <div class="form-group">
+                        <label class="form-label">Your Name</label>
+                        <input type="text" class="form-input" name="name" required placeholder="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-input" name="email" required placeholder="john@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Subject</label>
+                        <input type="text" class="form-input" name="subject" required placeholder="Let's collaborate">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Message</label>
+                        <textarea class="form-textarea" name="message" required placeholder="Tell me about your project..."></textarea>
+                    </div>
+                    <button type="submit" class="form-submit" id="submitBtn">
+                        Send Message
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p class="footer-text">© 2026 Deep H Bhavsar. Built with passion for AI & automation.</p>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
