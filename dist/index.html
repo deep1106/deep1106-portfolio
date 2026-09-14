@@ -898,6 +898,62 @@
                 grid-template-columns: 1fr;
             }
         }
+        /* UX refinement layer */
+        :focus-visible {
+            outline: 3px solid #a5b4fc;
+            outline-offset: 4px;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            min-width: 44px;
+            min-height: 44px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(255,255,255,.05);
+            color: var(--text-primary);
+            font-size: 20px;
+        }
+
+        .skill-icon, .project-icon, .workflow-icon {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: -.5px;
+        }
+
+        .project-card, .workflow-card, .skill-item, .contact-link, .btn-primary, .btn-secondary, .nav-cta {
+            will-change: transform;
+        }
+
+        @media (max-width: 968px) {
+            .mobile-menu-toggle { display: inline-flex; align-items: center; justify-content: center; }
+            nav { gap: 12px; }
+            nav .nav-cta { margin-left: auto; padding: 10px 16px; }
+            .nav-links {
+                position: absolute;
+                top: calc(100% + 10px);
+                left: 20px;
+                right: 20px;
+                display: none;
+                flex-direction: column;
+                gap: 0;
+                padding: 10px;
+                background: rgba(10,10,12,.97);
+                border: 1px solid var(--border-hover);
+                border-radius: 16px;
+                box-shadow: 0 20px 50px rgba(0,0,0,.45);
+            }
+            .nav-links.is-open { display: flex; }
+            .nav-links li a { display: block; padding: 14px 12px; border-radius: 10px; }
+            .nav-links li a:hover { background: rgba(255,255,255,.06); }
+            .nav-links a::after { display: none; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+            .reveal { opacity: 1; transform: none; }
+        }
     </style>
 </head>
 <body>
@@ -919,13 +975,14 @@
             <div class="logo-dot"></div>
             <span>deep1106</span>
         </a>
-        <ul class="nav-links">
+        <ul class="nav-links" id="nav-links">
             <li><a href="#about">About</a></li>
             <li><a href="#projects">Projects</a></li>
             <li><a href="#workflows">Workflows</a></li>
             <li><a href="#contact">Contact</a></li>
         </ul>
         <a href="#contact" class="nav-cta">Get in Touch</a>
+        <button class="mobile-menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="nav-links">☰</button>
     </nav>
 
     <!-- Hero Section -->
@@ -947,26 +1004,26 @@
                     View My Work
                     <span>→</span>
                 </a>
-                <a href="#contact" class="btn-secondary">
-                    Download CV
+                <a href="mailto:deep0611.db@gmail.com?subject=Portfolio%20inquiry" class="btn-secondary">
+                    Start a conversation
                 </a>
             </div>
             <div class="stats-bar">
                 <div class="stat-item">
-                    <div class="stat-value">5+</div>
-                    <div class="stat-label">Automation Workflows</div>
+                    <div class="stat-value">n8n</div>
+                    <div class="stat-label">Workflow automation</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-value">10+</div>
-                    <div class="stat-label">Projects Built</div>
+                    <div class="stat-value">AI</div>
+                    <div class="stat-label">Intelligent systems</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-value">3+</div>
-                    <div class="stat-label">Years Experience</div>
+                    <div class="stat-value">Web</div>
+                    <div class="stat-label">Full-stack builds</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-value">100%</div>
-                    <div class="stat-label">Client Satisfaction</div>
+                    <div class="stat-value">IN</div>
+                    <div class="stat-label">Based in India</div>
                 </div>
             </div>
         </div>
@@ -996,22 +1053,22 @@
                 </div>
                 <div class="skills-grid reveal">
                     <div class="skill-item">
-                        <div class="skill-icon">🤖</div>
+                        <div class="skill-icon" aria-hidden="true">AI</div>
                         <div class="skill-name">AI & Automation</div>
                         <div class="skill-desc">LLMs, RAG, n8n workflows, AI agents</div>
                     </div>
                     <div class="skill-item">
-                        <div class="skill-icon">💻</div>
+                        <div class="skill-icon" aria-hidden="true">FS</div>
                         <div class="skill-name">Full-Stack Dev</div>
                         <div class="skill-desc">Python, JavaScript, REST APIs</div>
                     </div>
                     <div class="skill-item">
-                        <div class="skill-icon">☁️</div>
+                        <div class="skill-icon" aria-hidden="true">CD</div>
                         <div class="skill-name">Cloud & DevOps</div>
                         <div class="skill-desc">Docker, CI/CD, Cloudflare</div>
                     </div>
                     <div class="skill-item">
-                        <div class="skill-icon">🎨</div>
+                        <div class="skill-icon" aria-hidden="true">UX</div>
                         <div class="skill-name">UI/UX Design</div>
                         <div class="skill-desc">Figma, modern web design</div>
                     </div>
@@ -1033,7 +1090,7 @@
             <div class="projects-grid">
                 <a href="https://github.com/deep1106/Python-For-Data-science-MOC-GVP" target="_blank" class="project-card reveal">
                     <div class="project-header">
-                        <div class="project-icon">🐍</div>
+                        <div class="project-icon" aria-hidden="true">PD</div>
                         <div class="project-arrow">↗</div>
                     </div>
                     <h3 class="project-title">Python Data Science MOC</h3>
@@ -1048,7 +1105,7 @@
                 </a>
                 <a href="https://github.com/deep1106/desktot-assistant" target="_blank" class="project-card reveal">
                     <div class="project-header">
-                        <div class="project-icon">🖥️</div>
+                        <div class="project-icon" aria-hidden="true">DA</div>
                         <div class="project-arrow">↗</div>
                     </div>
                     <h3 class="project-title">Desktop Assistant</h3>
@@ -1063,7 +1120,7 @@
                 </a>
                 <a href="https://github.com/deep1106/ChatGPT-Clone" target="_blank" class="project-card reveal">
                     <div class="project-header">
-                        <div class="project-icon">💬</div>
+                        <div class="project-icon" aria-hidden="true">AI</div>
                         <div class="project-arrow">↗</div>
                     </div>
                     <h3 class="project-title">ChatGPT Clone</h3>
@@ -1078,7 +1135,7 @@
                 </a>
                 <a href="https://github.com/deep1106/Car_Rental_System" target="_blank" class="project-card reveal">
                     <div class="project-header">
-                        <div class="project-icon">🚗</div>
+                        <div class="project-icon" aria-hidden="true">CR</div>
                         <div class="project-arrow">↗</div>
                     </div>
                     <h3 class="project-title">Car Rental System</h3>
@@ -1154,19 +1211,19 @@
             </div>
             <div class="contact-links reveal">
                 <a href="mailto:deep0611.db@gmail.com" class="contact-link" title="Email">
-                    📧
+                    <span aria-hidden="true">EM</span>
                 </a>
                 <a href="https://www.linkedin.com/in/deep-bhavsar-aaba3927a/" target="_blank" class="contact-link" title="LinkedIn">
-                    💼
+                    <span aria-hidden="true">IN</span>
                 </a>
                 <a href="https://github.com/deep1106" target="_blank" class="contact-link" title="GitHub">
-                    💻
+                    <span aria-hidden="true">GH</span>
                 </a>
-                <a href="https://twitter.com/Deep6112003" target="_blank" class="contact-link" title="Twitter/X">
-                    🐦
+                <a href="https://x.com/Deep6112003" target="_blank" class="contact-link" title="Twitter/X">
+                    <span aria-hidden="true">X</span>
                 </a>
                 <a href="https://www.instagram.com/deep__0611__/" target="_blank" class="contact-link" title="Instagram">
-                    📸
+                    <span aria-hidden="true">IG</span>
                 </a>
             </div>
             <div class="reveal" style="margin-top: 60px; padding: 40px; background: var(--bg-card); border-radius: 24px; border: 1px solid var(--border);">
@@ -1288,6 +1345,24 @@
         const statsBar = document.querySelector('.stats-bar');
         if (statsBar) {
             statsObserver.observe(statsBar);
+        }
+    </script>
+    <script>
+        const menuButton = document.querySelector('.mobile-menu-toggle');
+        const navLinks = document.querySelector('#nav-links');
+        if (menuButton && navLinks) {
+            menuButton.addEventListener('click', () => {
+                const open = navLinks.classList.toggle('is-open');
+                menuButton.setAttribute('aria-expanded', String(open));
+                menuButton.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+                menuButton.textContent = open ? '×' : '☰';
+            });
+            navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+                navLinks.classList.remove('is-open');
+                menuButton.setAttribute('aria-expanded', 'false');
+                menuButton.setAttribute('aria-label', 'Open navigation');
+                menuButton.textContent = '☰';
+            }));
         }
     </script>
 </body>
