@@ -18,13 +18,13 @@
             --text-muted: #6e6e73;
             --border: rgba(255, 255, 255, 0.08);
             --border-hover: rgba(255, 255, 255, 0.15);
-            --accent-primary: #6366f1;
-            --accent-secondary: #8b5cf6;
-            --accent-tertiary: #a855f7;
-            --accent-glow: rgba(99, 102, 241, 0.4);
-            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --accent-primary: #c7f36b;
+            --accent-secondary: #e7b86b;
+            --accent-tertiary: #f4f0e6;
+            --accent-glow: rgba(199, 243, 107, 0.18);
+            --gradient-1: #c7f36b;
+            --gradient-2: #e7b86b;
+            --gradient-3: #f4f0e6;
             --font-primary: 'Inter', system-ui, -apple-system, sans-serif;
             --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
         }
@@ -954,6 +954,39 @@
             *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
             .reveal { opacity: 1; transform: none; }
         }
+        /* Final Impeccable pass: editorial, low-noise, responsive */
+        html { scroll-padding-top: 96px; }
+        section { scroll-margin-top: 96px; }
+        body { cursor: auto; }
+        .cursor, .cursor-follower { display: none; }
+        .bg-gradient { display: none; }
+        .grid-overlay { opacity: .45; background-size: 72px 72px; }
+        .gradient-text { background: none; color: var(--accent-primary); -webkit-text-fill-color: currentColor; animation: none; }
+        .logo-dot { background: var(--accent-primary); box-shadow: none; }
+        .hero-badge, .section-tag { color: var(--accent-primary); border-color: rgba(199,243,107,.28); background: rgba(199,243,107,.07); }
+        .btn-primary { background: var(--accent-primary); color: #11140b; box-shadow: none; }
+        .btn-primary:hover { box-shadow: 0 12px 30px rgba(199,243,107,.16); }
+        .skill-icon, .project-icon, .workflow-icon { background: transparent; color: var(--accent-primary); border: 1px solid rgba(199,243,107,.35); box-shadow: none; }
+        .skill-icon svg, .project-icon svg, .workflow-icon svg, .contact-link svg { width: 26px; height: 26px; display: block; }
+        .contact-link svg { width: 24px; height: 24px; }
+        .project-icon svg { width: 30px; height: 30px; }
+        .workflow-icon svg { width: 25px; height: 25px; }
+        .contact-link { font-family: var(--font-mono); font-weight: 700; font-size: 14px; }
+        .stat-value { background: none; color: var(--text-primary); -webkit-text-fill-color: currentColor; }
+        @media (max-width: 640px) {
+            nav { padding: 16px 20px; }
+            nav.scrolled { padding: 12px 20px; }
+            nav .nav-cta { display: none; }
+            section { padding: 84px 20px; }
+            .hero { padding: 112px 20px 72px; min-height: auto; }
+            .hero h1 { letter-spacing: -2px; }
+            .hero-subtitle { font-size: 17px; }
+            .project-card { padding: 28px; }
+            .section-header { margin-bottom: 56px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+        }
     </style>
 </head>
 <body>
@@ -1090,7 +1123,7 @@
             <div class="projects-grid">
                 <a href="https://github.com/deep1106/Python-For-Data-science-MOC-GVP" target="_blank" class="project-card reveal">
                     <div class="project-header">
-                        <div class="project-icon" aria-hidden="true">PD</div>
+                        <div class="project-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h16v16H4z" opacity=".18"/><path fill="currentColor" d="M5 6h14v2H5zm0 5h9v2H5zm0 5h14v2H5z"/></svg></div>
                         <div class="project-arrow">↗</div>
                     </div>
                     <h3 class="project-title">Python Data Science MOC</h3>
@@ -1105,7 +1138,7 @@
                 </a>
                 <a href="https://github.com/deep1106/desktot-assistant" target="_blank" class="project-card reveal">
                     <div class="project-header">
-                        <div class="project-icon" aria-hidden="true">DA</div>
+                        <div class="project-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 5h16v14H4z" opacity=".18"/><path fill="currentColor" d="M6 7h12v2H6zm0 4h5v2H6zm0 4h8v2H6z"/></svg></div>
                         <div class="project-arrow">↗</div>
                     </div>
                     <h3 class="project-title">Desktop Assistant</h3>
@@ -1120,7 +1153,7 @@
                 </a>
                 <a href="https://github.com/deep1106/ChatGPT-Clone" target="_blank" class="project-card reveal">
                     <div class="project-header">
-                        <div class="project-icon" aria-hidden="true">AI</div>
+                        <div class="project-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 4h14v16H5z" opacity=".18"/><path fill="currentColor" d="M8 8h8v2H8zm0 4h8v2H8zm0 4h5v2H8z"/></svg></div>
                         <div class="project-arrow">↗</div>
                     </div>
                     <h3 class="project-title">ChatGPT Clone</h3>
@@ -1135,7 +1168,7 @@
                 </a>
                 <a href="https://github.com/deep1106/Car_Rental_System" target="_blank" class="project-card reveal">
                     <div class="project-header">
-                        <div class="project-icon" aria-hidden="true">CR</div>
+                        <div class="project-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 7h16v12H4z" opacity=".18"/><path fill="currentColor" d="M7 5h10v2H7zM8 10h8v2H8zm0 4h5v2H8z"/></svg></div>
                         <div class="project-arrow">↗</div>
                     </div>
                     <h3 class="project-title">Car Rental System</h3>
@@ -1165,7 +1198,7 @@
             <div class="projects-grid">
                 <div class="workflow-card reveal">
                     <div class="workflow-header">
-                        <div class="workflow-icon">📄</div>
+                        <div class="workflow-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 3h10l4 4v14H5z" opacity=".18"/><path fill="none" stroke="currentColor" stroke-width="1.6" d="M8 11h8M8 15h8M8 7h5"/></svg></div>
                         <span class="workflow-status">Active</span>
                     </div>
                     <h3 class="workflow-title">Doc Creation Sari V2</h3>
@@ -1173,7 +1206,7 @@
                 </div>
                 <div class="workflow-card reveal">
                     <div class="workflow-header">
-                        <div class="workflow-icon">🖼️</div>
+                        <div class="workflow-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="10" r="1.5" fill="currentColor"/><path fill="none" stroke="currentColor" stroke-width="1.6" d="m6 17 4-4 3 3 2-2 3 3"/></svg></div>
                         <span class="workflow-status">Active</span>
                     </div>
                     <h3 class="workflow-title">AI Image Generator</h3>
@@ -1181,7 +1214,7 @@
                 </div>
                 <div class="workflow-card reveal">
                     <div class="workflow-header">
-                        <div class="workflow-icon">📊</div>
+                        <div class="workflow-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" d="M5 19V5m0 14h14"/><path fill="none" stroke="currentColor" stroke-width="2" d="m8 16 3-4 3 2 4-6"/></svg></div>
                         <span class="workflow-status">Active</span>
                     </div>
                     <h3 class="workflow-title">Barcode to Sheets</h3>
@@ -1189,7 +1222,7 @@
                 </div>
                 <div class="workflow-card reveal">
                     <div class="workflow-header">
-                        <div class="workflow-icon">📁</div>
+                        <div class="workflow-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 6h6l2 2h8v11H4z" opacity=".18"/><path fill="none" stroke="currentColor" stroke-width="1.6" d="M4 6h6l2 2h8v11H4z"/></svg></div>
                         <span class="workflow-status">Active</span>
                     </div>
                     <h3 class="workflow-title">Catalog Management</h3>
@@ -1211,19 +1244,19 @@
             </div>
             <div class="contact-links reveal">
                 <a href="mailto:deep0611.db@gmail.com" class="contact-link" title="Email">
-                    <span aria-hidden="true">EM</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M3 6.5h18v11H3zM3 7l9 6 9-6"/></svg>
                 </a>
                 <a href="https://www.linkedin.com/in/deep-bhavsar-aaba3927a/" target="_blank" class="contact-link" title="LinkedIn">
-                    <span aria-hidden="true">IN</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5 4h14v16H5z" opacity=".18"/><path fill="currentColor" d="M8 9h3v8H8zm1.5-4A1.5 1.5 0 1 1 8 6.5 1.5 1.5 0 0 1 9.5 5M13 9h3v1.2c.7-.9 1.6-1.5 3-1.5V12c-1.5 0-3 .4-3 2.1V17h-3z"/></svg>
                 </a>
                 <a href="https://github.com/deep1106" target="_blank" class="contact-link" title="GitHub">
-                    <span aria-hidden="true">GH</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3a9 9 0 0 0-2.8 17.6c.45.08.62-.2.62-.43v-1.55c-2.52.55-3.05-1.07-3.05-1.07-.4-1.02-.98-1.3-.98-1.3-.8-.55.06-.54.06-.54.88.06 1.35.9 1.35.9.79 1.35 2.06.96 2.56.74.08-.57.31-.96.56-1.18-2.01-.23-4.13-1.01-4.13-4.5 0-.99.35-1.8.92-2.44-.09-.23-.4-1.15.09-2.4 0 0 .75-.24 2.47.93A8.6 8.6 0 0 1 12 8.46c.76 0 1.52.1 2.23.3 1.72-1.17 2.47-.93 2.47-.93.49 1.25.18 2.17.09 2.4.57.64.92 1.45.92 2.44 0 3.5-2.13 4.27-4.15 4.5.33.28.62.83.62 1.67v2.33c0 .23.16.51.63.42A9 9 0 0 0 12 3"/></svg>
                 </a>
                 <a href="https://x.com/Deep6112003" target="_blank" class="contact-link" title="Twitter/X">
-                    <span aria-hidden="true">X</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.9 2H22l-6.77 7.74L23.2 22h-6.24l-4.89-6.4L6.47 22H3.36l7.24-8.28L2.8 2h6.4l4.42 5.84zM17.8 19.8h1.73L8.3 4.1H6.44z"/></svg>
                 </a>
                 <a href="https://www.instagram.com/deep__0611__/" target="_blank" class="contact-link" title="Instagram">
-                    <span aria-hidden="true">IG</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.3" cy="6.8" r="1" fill="currentColor"/></svg>
                 </a>
             </div>
             <div class="reveal" style="margin-top: 60px; padding: 40px; background: var(--bg-card); border-radius: 24px; border: 1px solid var(--border);">
@@ -1294,15 +1327,21 @@
             observer.observe(el);
         });
 
-        // Smooth scroll for navigation
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
+        // Reliable section navigation
+        document.addEventListener('click', (event) => {
+            const link = event.target.closest('a[href^="#"]');
+            if (!link) return;
+            const id = link.getAttribute('href').slice(1);
+            if (!id) {
+                event.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+            const target = document.getElementById(id);
+            if (!target) return;
+            event.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            history.replaceState(null, '', `#${id}`);
         });
 
         // Counter animation for stats
