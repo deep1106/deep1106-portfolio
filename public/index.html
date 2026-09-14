@@ -987,10 +987,38 @@
         @media (prefers-reduced-motion: reduce) {
             html { scroll-behavior: auto; }
         }
+        .nav-links a.is-current { color: var(--text-primary); }
+        .nav-links a.is-current::after { width: 100%; background: var(--accent-primary); }
+        .scroll-progress { position: fixed; top: 0; left: 0; z-index: 2000; width: 0; height: 3px; background: var(--accent-primary); transition: width .12s linear; }
+        .command-trigger { display: inline-flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 12px; border: 1px solid var(--border); border-radius: 10px; color: var(--text-secondary); background: rgba(255,255,255,.03); font: 500 12px var(--font-mono); cursor: pointer; }
+        .command-trigger:hover, .command-trigger:focus-visible { color: var(--text-primary); border-color: var(--border-hover); }
+        kbd { padding: 3px 6px; border: 1px solid var(--border); border-radius: 5px; color: var(--text-muted); font: 11px var(--font-mono); }
+        .project-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: -34px 0 28px; }
+        .project-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+        .filter-button { min-height: 40px; padding: 0 14px; border: 1px solid var(--border); border-radius: 999px; color: var(--text-secondary); background: transparent; font: 500 12px var(--font-mono); cursor: pointer; }
+        .filter-button:hover, .filter-button.is-active { color: #11140b; background: var(--accent-primary); border-color: var(--accent-primary); }
+        .project-count { color: var(--text-muted); font: 12px var(--font-mono); white-space: nowrap; }
+        .project-card.is-hidden { display: none; }
+        .project-card.is-highlighted { border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(199,243,107,.1); }
+        .command-palette[hidden] { display: none; }
+        .command-palette { position: fixed; inset: 0; z-index: 3000; display: grid; place-items: start center; padding: 12vh 20px 20px; }
+        .command-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.72); backdrop-filter: blur(8px); }
+        .command-panel { position: relative; width: min(620px, 100%); padding: 24px; background: #111114; border: 1px solid var(--border-hover); border-radius: 20px; box-shadow: 0 30px 100px rgba(0,0,0,.55); }
+        .command-heading { display: flex; justify-content: space-between; gap: 16px; align-items: start; margin-bottom: 22px; }
+        .command-heading h2 { margin-top: 10px; font-size: 24px; letter-spacing: -.8px; }
+        .command-close { min-height: 36px; padding: 0 10px; border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--text-muted); cursor: pointer; }
+        .command-search-label { display: block; margin-bottom: 8px; color: var(--text-muted); font: 12px var(--font-mono); }
+        .command-search { width: 100%; min-height: 50px; padding: 0 14px; border: 1px solid var(--border-hover); border-radius: 10px; outline: none; color: var(--text-primary); background: #08080a; font: 15px var(--font-primary); }
+        .command-search:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(199,243,107,.1); }
+        .command-results { display: grid; gap: 6px; margin-top: 16px; }
+        .command-results button { display: flex; align-items: center; justify-content: space-between; min-height: 48px; padding: 0 12px; border: 1px solid transparent; border-radius: 9px; color: var(--text-primary); background: transparent; text-align: left; cursor: pointer; }
+        .command-results button:hover, .command-results button:focus-visible { border-color: var(--border); background: rgba(255,255,255,.05); }
+        @media (max-width: 968px) { .command-trigger { display: none; } }
+        @media (max-width: 640px) { .project-toolbar { align-items: flex-start; flex-direction: column; margin-top: -12px; } }
     </style>
 </head>
 <body>
-    <!-- Custom Cursor -->
+    <div class="scroll-progress" aria-hidden="true"></div>
     <div class="cursor"></div>
     <div class="cursor-follower"></div>
 
@@ -1014,6 +1042,7 @@
             <li><a href="#workflows">Workflows</a></li>
             <li><a href="#contact">Contact</a></li>
         </ul>
+        <button class="command-trigger" type="button" aria-label="Open command palette"><span>Search</span><kbd>⌘K</kbd></button>
         <a href="#contact" class="nav-cta">Get in Touch</a>
         <button class="mobile-menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="nav-links">☰</button>
     </nav>
@@ -1120,8 +1149,17 @@
                     A selection of projects showcasing my expertise in AI, automation, and full-stack development.
                 </p>
             </div>
+            <div class="project-toolbar reveal">
+                <div class="project-filters" role="group" aria-label="Filter projects">
+                    <button class="filter-button is-active" type="button" data-filter="all" aria-pressed="true">All</button>
+                    <button class="filter-button" type="button" data-filter="automation" aria-pressed="false">Automation</button>
+                    <button class="filter-button" type="button" data-filter="ai" aria-pressed="false">AI</button>
+                    <button class="filter-button" type="button" data-filter="fullstack" aria-pressed="false">Full-stack</button>
+                </div>
+                <span class="project-count" aria-live="polite">4 projects</span>
+            </div>
             <div class="projects-grid">
-                <a href="https://github.com/deep1106/Python-For-Data-science-MOC-GVP" target="_blank" class="project-card reveal">
+                <a data-category="fullstack" href="https://github.com/deep1106/Python-For-Data-science-MOC-GVP" target="_blank" class="project-card reveal">
                     <div class="project-header">
                         <div class="project-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h16v16H4z" opacity=".18"/><path fill="currentColor" d="M5 6h14v2H5zm0 5h9v2H5zm0 5h14v2H5z"/></svg></div>
                         <div class="project-arrow">↗</div>
@@ -1136,7 +1174,7 @@
                         <span class="tag">Education</span>
                     </div>
                 </a>
-                <a href="https://github.com/deep1106/desktot-assistant" target="_blank" class="project-card reveal">
+                <a data-category="automation ai" href="https://github.com/deep1106/desktot-assistant" target="_blank" class="project-card reveal">
                     <div class="project-header">
                         <div class="project-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 5h16v14H4z" opacity=".18"/><path fill="currentColor" d="M6 7h12v2H6zm0 4h5v2H6zm0 4h8v2H6z"/></svg></div>
                         <div class="project-arrow">↗</div>
@@ -1151,7 +1189,7 @@
                         <span class="tag">Automation</span>
                     </div>
                 </a>
-                <a href="https://github.com/deep1106/ChatGPT-Clone" target="_blank" class="project-card reveal">
+                <a data-category="ai fullstack" href="https://github.com/deep1106/ChatGPT-Clone" target="_blank" class="project-card reveal">
                     <div class="project-header">
                         <div class="project-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 4h14v16H5z" opacity=".18"/><path fill="currentColor" d="M8 8h8v2H8zm0 4h8v2H8zm0 4h5v2H8z"/></svg></div>
                         <div class="project-arrow">↗</div>
@@ -1166,7 +1204,7 @@
                         <span class="tag">UI/UX</span>
                     </div>
                 </a>
-                <a href="https://github.com/deep1106/Car_Rental_System" target="_blank" class="project-card reveal">
+                <a data-category="fullstack" href="https://github.com/deep1106/Car_Rental_System" target="_blank" class="project-card reveal">
                     <div class="project-header">
                         <div class="project-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 7h16v12H4z" opacity=".18"/><path fill="currentColor" d="M7 5h10v2H7zM8 10h8v2H8zm0 4h5v2H8z"/></svg></div>
                         <div class="project-arrow">↗</div>
@@ -1272,6 +1310,24 @@
             </div>
         </div>
     </section>
+
+    <div class="command-palette" id="command-palette" role="dialog" aria-modal="true" aria-labelledby="command-title" hidden>
+        <div class="command-backdrop" data-command-close></div>
+        <div class="command-panel">
+            <div class="command-heading">
+                <div><span class="section-tag">Quick navigation</span><h2 id="command-title">Where do you want to go?</h2></div>
+                <button class="command-close" type="button" aria-label="Close command palette" data-command-close>Esc</button>
+            </div>
+            <label class="command-search-label" for="command-search">Search sections</label>
+            <input id="command-search" class="command-search" type="search" placeholder="Try projects, workflows, contact…" autocomplete="off">
+            <div class="command-results" role="listbox">
+                <button type="button" data-command-target="about" role="option"><span>About</span><kbd>01</kbd></button>
+                <button type="button" data-command-target="projects" role="option"><span>Projects</span><kbd>02</kbd></button>
+                <button type="button" data-command-target="workflows" role="option"><span>Workflows</span><kbd>03</kbd></button>
+                <button type="button" data-command-target="contact" role="option"><span>Contact</span><kbd>04</kbd></button>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer>
@@ -1403,6 +1459,79 @@
                 menuButton.textContent = '☰';
             }));
         }
+    </script>
+    <script>
+        // Interaction layer: filters, command palette, active navigation, progress
+        const progress = document.querySelector('.scroll-progress');
+        const updateProgress = () => {
+            const max = document.documentElement.scrollHeight - window.innerHeight;
+            if (progress) progress.style.width = `${max > 0 ? (window.scrollY / max) * 100 : 0}%`;
+        };
+        window.addEventListener('scroll', updateProgress, { passive: true });
+        updateProgress();
+
+        const filterButtons = document.querySelectorAll('.filter-button');
+        const projectCards = document.querySelectorAll('.project-card[data-category]');
+        const projectCount = document.querySelector('.project-count');
+        filterButtons.forEach(button => button.addEventListener('click', () => {
+            const filter = button.dataset.filter;
+            filterButtons.forEach(item => {
+                const active = item === button;
+                item.classList.toggle('is-active', active);
+                item.setAttribute('aria-pressed', String(active));
+            });
+            let visible = 0;
+            projectCards.forEach(card => {
+                const show = filter === 'all' || card.dataset.category.split(' ').includes(filter);
+                card.classList.toggle('is-hidden', !show);
+                if (show) visible += 1;
+            });
+            if (projectCount) projectCount.textContent = `${visible} project${visible === 1 ? '' : 's'}`;
+        }));
+
+        const palette = document.querySelector('#command-palette');
+        const paletteInput = document.querySelector('#command-search');
+        const commandTrigger = document.querySelector('.command-trigger');
+        const commandClose = () => {
+            if (!palette) return;
+            palette.hidden = true;
+            document.body.style.overflow = '';
+        };
+        const commandOpen = () => {
+            if (!palette) return;
+            palette.hidden = false;
+            document.body.style.overflow = 'hidden';
+            paletteInput?.focus();
+        };
+        commandTrigger?.addEventListener('click', commandOpen);
+        palette?.querySelectorAll('[data-command-close]').forEach(el => el.addEventListener('click', commandClose));
+        palette?.querySelectorAll('[data-command-target]').forEach(button => button.addEventListener('click', () => {
+            const target = document.getElementById(button.dataset.commandTarget);
+            commandClose();
+            target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            history.replaceState(null, '', `#${button.dataset.commandTarget}`);
+        }));
+        paletteInput?.addEventListener('input', () => {
+            const query = paletteInput.value.toLowerCase().trim();
+            palette?.querySelectorAll('[data-command-target]').forEach(button => {
+                button.hidden = query && !button.innerText.toLowerCase().includes(query);
+            });
+        });
+        document.addEventListener('keydown', event => {
+            if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+                event.preventDefault();
+                palette?.hidden ? commandOpen() : commandClose();
+            }
+            if (event.key === 'Escape') commandClose();
+        });
+
+        const navAnchors = [...document.querySelectorAll('.nav-links a')];
+        const sections = navAnchors.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+        const sectionObserver = new IntersectionObserver(entries => entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            navAnchors.forEach(link => link.classList.toggle('is-current', link.getAttribute('href') === `#${entry.target.id}`));
+        }), { rootMargin: '-30% 0px -55% 0px', threshold: 0 });
+        sections.forEach(section => sectionObserver.observe(section));
     </script>
 </body>
 </html>
